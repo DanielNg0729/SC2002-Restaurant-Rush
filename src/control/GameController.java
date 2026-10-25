@@ -1,6 +1,9 @@
 package control;
 
+import entity.ActionResult;
+import entity.HappyHour;
 import entity.Restaurant;
+import entity.StandardPricing;
 
 /**
  * Runs the game turn by turn and decides if the player wins or loses. All the game rules live here, while the UI stuff
@@ -13,17 +16,20 @@ public class GameController {
     private static final int MAX_TURNS = 18;
 
     private final Restaurant restaurant;
+    private final HappyHour happyHour;
     private final ArrivalSchedule arrivalSchedule;
     private int currentTurn;
 
     /**
-     * Sets up a new game. (This constructor isn't on the class diagram.)
+     * Sets up a new game. Happy Hour starts off unused and sits on top of standard pricing. (This constructor isn't on
+     * the class diagram.)
      *
      * @param restaurant      the restaurant we're playing in
      * @param arrivalSchedule when customers arrive
      */
     public GameController(Restaurant restaurant, ArrivalSchedule arrivalSchedule) {
         this.restaurant = restaurant;
+        this.happyHour = new HappyHour(new StandardPricing());
         this.arrivalSchedule = arrivalSchedule;
     }
 
@@ -74,6 +80,17 @@ public class GameController {
      */
     private void processEndTurn() {
         // TODO
+    }
+
+    /**
+     * Turns on Happy Hour for the current turn if the player asks for it and it hasn't been used yet.
+     *
+     * @return whether it worked, and why not if it didn't
+     * @since Stage 3
+     */
+    private ActionResult activateHappyHour() {
+        // TODO
+        return null;
     }
 
     /**

@@ -77,6 +77,17 @@ public class RestaurantCLI {
     }
 
     /**
+     * Asks the player at the start of the turn if they want to turn on Happy Hour.
+     *
+     * @return true if the player wants Happy Hour now
+     * @since Stage 3
+     */
+    public boolean chooseHappyHourActivation() {
+        // TODO
+        return false;
+    }
+
+    /**
      * Prints a message for the player, e.g. what an action did or why a choice didn't work.
      *
      * @param message the text to print
