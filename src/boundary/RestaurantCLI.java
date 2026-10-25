@@ -52,6 +52,19 @@ public class RestaurantCLI {
     }
 
     /**
+     * Shows the Host's tasks plus a Wait option and returns what the player picks. Keeps asking until the input is
+     * valid.
+     *
+     * @param tasks what the Host can do this turn
+     * @return the task the player picked
+     * @since Stage 3
+     */
+    public StaffTask chooseHostTask(List<StaffTask> tasks) {
+        // TODO
+        return null;
+    }
+
+    /**
      * Shows the Chef's tasks plus a Wait option and returns what the player picks. Keeps asking until the input is
      * valid.
      *

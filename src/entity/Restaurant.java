@@ -20,6 +20,7 @@ public class Restaurant {
     private final Waiter waiter;
     private final Chef chef;
     private final Cashier cashier;
+    private final Host host;
     private int departureCount = 0;
 
     /**
@@ -39,6 +40,7 @@ public class Restaurant {
         this.waiter = new Waiter("Waiter");
         this.chef = new Chef("Chef");
         this.cashier = new Cashier("Cashier");
+        this.host = new Host("Host");
     }
 
     public Menu getMenu() {
@@ -116,12 +118,22 @@ public class Restaurant {
     }
 
     /**
-     * Every staff member, in the order they act each turn (Waiter, Chef, Cashier).
+     * The Host, who seats customers alongside the Waiter.
+     *
+     * @return the Host
+     * @since Stage 3
+     */
+    public Host getHost() {
+        return host;
+    }
+
+    /**
+     * Every staff member, in the order they act each turn (Host, Waiter, Chef, Cashier).
      *
      * @return the staff (read-only list)
      */
     public List<Staff> getAllStaff() {
-        return List.of(waiter, chef, cashier);
+        return List.of(host, waiter, chef, cashier);
     }
 
     /**
