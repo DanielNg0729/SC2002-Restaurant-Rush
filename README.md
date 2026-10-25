@@ -7,7 +7,7 @@ and its Javadoc explains what it has to do.
 ## Build and run
 
 ```bash
-javac -d out src/Main.java src/boundary/*.java src/control/*.java src/entity/*.java
+javac -d out src/*.java src/boundary/*.java src/control/*.java src/entity/*.java
 java -cp out Main
 ```
 
@@ -19,7 +19,7 @@ java -cp out Main
 | 2 | Orders & pricing | | `Order`, `PricingPolicy`, `StandardPricing`, `ComboMeal`, `HappyHour` | 17 | 1 | `task2-pricing` |
 | 3 | Staff | | `Staff`, `StaffTask`, `FrontOfHouseStaff`, `Waiter`, `Chef`, `Cashier`, `Host` | 15 | 1, 2, 4 | `task3-staff` |
 | 4 | Restaurant floor | | `Table`, `WaitingQueue`, `SalesLedger`, `Restaurant`, `ArrivalSchedule` | 17 | 2 | `task4-restaurant` |
-| 5 | Game flow & CLI | | `GameController`, `RestaurantCLI` | 16 | 1-4 | `task5-game` |
+| 5 | Game flow & CLI | | `GameController`, `RestaurantCLI`, `Game` | 16 | 1-4 | `task5-game` |
 
 Merge order: tasks 1, 2 and 4 first, then 3, then 5.
 
