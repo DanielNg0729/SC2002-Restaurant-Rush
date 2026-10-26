@@ -68,7 +68,8 @@ Merge order: tasks 1, 2 and 4 first, then 3, then 5.
 - `Restaurant`: `getFreeTables`, `findTableOf`, `getSeatedCustomers`, `getActiveOrders`, `removeLeavingCustomer`
   (cancel the unfinished order, remove from the queue or free the table, count the departure).
 - `ArrivalSchedule`: `isArrivalTurn`, `createCustomer` (the n-th arrival gets id n). For Stage 2, at least one of the
-  six arrivals must be a VIP and one a Critic. Pick which ones and note it here.
+  six arrivals must be a VIP and one a Critic. Arrival 2 (turn 4) is the VIP and arrival 5 (turn 13) is the Critic.
+  The other four are Regular.
 
 ### Task 5 - Game flow & CLI
 
