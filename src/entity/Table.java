@@ -31,8 +31,7 @@ public class Table {
      * @return true if the table is free
      */
     public boolean isFree() {
-        // TODO
-        return false;
+        return occupant == null;
     }
 
     /**
@@ -48,15 +47,19 @@ public class Table {
      * Puts {@code customer} at this table (it has to be free). The table stays taken until they pay or leave.
      *
      * @param customer the customer to seat
+     * @throws IllegalStateException if someone is already sitting here
      */
     void seat(Customer customer) {
-        // TODO
+        if (!isFree()) {
+            throw new IllegalStateException("Table " + number + " is already taken");
+        }
+        occupant = customer;
     }
 
     /**
      * Frees up the table when the customer pays or leaves.
      */
     void release() {
-        // TODO
+        occupant = null;
     }
 }
