@@ -62,8 +62,9 @@ public class Restaurant {
      * @return the free tables
      */
     public List<Table> getFreeTables() {
-        // TODO
-        return List.of();
+        return tables.stream()
+                .filter(Table::isFree)
+                .toList();
     }
 
     /**
@@ -73,8 +74,9 @@ public class Restaurant {
      * @return their table, or empty if they aren't seated
      */
     public Optional<Table> findTableOf(Customer customer) {
-        // TODO
-        return Optional.empty();
+        return tables.stream()
+                .filter(table -> table.getOccupant().filter(customer::equals).isPresent())
+                .findFirst();
     }
 
     /**
@@ -83,8 +85,10 @@ public class Restaurant {
      * @return the seated customers
      */
     public List<Customer> getSeatedCustomers() {
-        // TODO
-        return List.of();
+        return tables.stream()
+                .map(Table::getOccupant)
+                .flatMap(Optional::stream)
+                .toList();
     }
 
     /**
@@ -93,8 +97,12 @@ public class Restaurant {
      * @return the active orders
      */
     public List<Order> getActiveOrders() {
-        // TODO
-        return List.of();
+        return getSeatedCustomers().stream()
+                .map(Customer::getOrder)
+                .flatMap(Optional::stream)
+                .filter(order -> order.getStatus() != OrderStatus.PAID
+                        && order.getStatus() != OrderStatus.CANCELLED)
+                .toList();
     }
 
     public WaitingQueue getWaitingQueue() {
@@ -137,13 +145,19 @@ public class Restaurant {
     }
 
     /**
-     * Deals with a customer who leaves unhappy. Cancels their order if it isn't finished, takes them out of the queue
-     * or frees their table, and adds one to the departure count.
+     * Deals with a customer who leaves unhappy. Cancels their order if it isn't finished (still being cooked, or READY
+     * but not served yet), takes them out of the queue or frees their table, and adds one to the departure count.
      *
      * @param customer the customer who's leaving
      */
     public void removeLeavingCustomer(Customer customer) {
-        // TODO
+        customer.getOrder()
+                .filter(order -> order.needsPreparation() || order.isReady())
+                .ifPresent(Order::cancel);
+        if (!waitingQueue.remove(customer)) {
+            findTableOf(customer).ifPresent(Table::release);
+        }
+        departureCount++;
     }
 
     public int getDepartureCount() {

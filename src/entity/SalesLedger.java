@@ -27,7 +27,9 @@ public class SalesLedger {
      * @param order the order being paid for
      */
     void recordPayment(Order order) {
-        // TODO
+        revenueCents += order.getBillCents();
+        paidCount++;
+        satisfactionSum += order.getCustomer().getSatisfaction();
     }
 
     /**
@@ -50,7 +52,9 @@ public class SalesLedger {
      * @return average paid satisfaction
      */
     public OptionalDouble getAverageSatisfaction() {
-        // TODO
-        return OptionalDouble.empty();
+        if (paidCount == 0) {
+            return OptionalDouble.empty();
+        }
+        return OptionalDouble.of((double) satisfactionSum / paidCount);
     }
 }

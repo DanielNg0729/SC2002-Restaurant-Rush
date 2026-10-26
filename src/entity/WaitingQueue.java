@@ -26,7 +26,7 @@ public class WaitingQueue {
      * @param customer the customer who arrived
      */
     public void join(Customer customer) {
-        // TODO
+        customers.add(customer);
     }
 
     /**
@@ -36,8 +36,7 @@ public class WaitingQueue {
      * @return true if they were actually in the queue
      */
     boolean remove(Customer customer) {
-        // TODO
-        return false;
+        return customers.remove(customer);
     }
 
     /**
@@ -47,8 +46,7 @@ public class WaitingQueue {
      * @return true if they're in the queue
      */
     public boolean contains(Customer customer) {
-        // TODO
-        return false;
+        return customers.contains(customer);
     }
 
     /**
@@ -66,8 +64,7 @@ public class WaitingQueue {
      * @return true if the queue is empty
      */
     public boolean isEmpty() {
-        // TODO
-        return false;
+        return customers.isEmpty();
     }
 
     /**
@@ -76,7 +73,6 @@ public class WaitingQueue {
      * @return the queue length
      */
     public int size() {
-        // TODO
-        return 0;
+        return customers.size();
     }
 }
