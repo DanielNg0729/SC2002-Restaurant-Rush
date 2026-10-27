@@ -1,30 +1,32 @@
 package entity;
-
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Base class for every customer type. A customer looks after their own satisfaction and state, and subclasses just
- * override the hooks.
- *
- * @since Stage 1
- */
 public abstract class Customer {
 
     private static final int MAX_SATISFACTION = 100;
 
     private final int id;
     private final int arrivalTurn;
+
     private int satisfaction = MAX_SATISFACTION;
     private CustomerState state = CustomerState.WAITING;
     private Order order;
 
-    /**
-     * New customers arrive with full satisfaction and join the waiting queue.
-     *
-     * @param id          arrival number, starting from 1
-     * @param arrivalTurn the turn they arrive on
-     */
     protected Customer(int id, int arrivalTurn) {
+        if (id < 1) {
+            throw new IllegalArgumentException(
+                    "Customer id must be at least 1."
+            );
+        }
+
+        if (arrivalTurn < 1) {
+            throw new IllegalArgumentException(
+                    "Arrival turn must be at least 1."
+            );
+        }
+
         this.id = id;
         this.arrivalTurn = arrivalTurn;
     }
@@ -37,11 +39,6 @@ public abstract class Customer {
         return arrivalTurn;
     }
 
-    /**
-     * Current satisfaction, somewhere between 0 and {@code MAX_SATISFACTION}.
-     *
-     * @return current satisfaction
-     */
     public int getSatisfaction() {
         return satisfaction;
     }
@@ -50,147 +47,132 @@ public abstract class Customer {
         return state;
     }
 
-    /**
-     * The customer's order, once they've placed one.
-     *
-     * @return the order, or empty if they haven't ordered yet
-     */
     public Optional<Order> getOrder() {
         return Optional.ofNullable(order);
     }
 
-    /**
-     * Checks if the customer is done eating and waiting for the Cashier.
-     *
-     * @return true if the customer is READY_TO_PAY
-     */
     public boolean isReadyToPay() {
-        // TODO
-        return false;
+        return state == CustomerState.READY_TO_PAY;
     }
 
-    /**
-     * Checks if the customer hit 0 satisfaction and walked out without paying.
-     *
-     * @return true if the customer is LEFT
-     */
     public boolean hasLeft() {
-        // TODO
-        return false;
+        return state == CustomerState.LEFT;
     }
 
-    /**
-     * Default way of picking an order: customer n orders menu item n, going back to item 1 after the last one.
-     *
-     * @param menu the menu to pick from
-     * @return the chosen item
-     */
+    
     public MenuItem chooseItem(Menu menu) {
-        // TODO
-        return null;
+        Objects.requireNonNull(menu, "Menu must not be null.");
+
+        List<MenuItem> items = menu.getItems();
+
+        if (items.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Cannot choose an item from an empty menu."
+            );
+        }
+
+        int index = (id - 1) % items.size();
+        return items.get(index);
     }
 
-    /**
-     * How much of the menu price this customer pays, as a percentage. Normal customers pay full price.
-     *
-     * @return the price percentage (100 by default)
-     */
+    
     public int getPricePercent() {
         return 100;
     }
 
-    /**
-     * End-of-turn rules, the same for every customer type. If they were served on an earlier turn they finish eating.
-     * If they're still waiting for a table or food they lose {@link #getWaitingLoss()} points (never below 0) and leave
-     * once they hit 0. Customers who are served, eating or ready to pay don't lose anything.
-     */
+    
     public final void endTurn() {
-        // TODO
+        if (state.isAwaitingService()) {
+            applyWaitingLoss();
+        } else if (state == CustomerState.SERVED
+                || state == CustomerState.EATING) {
+            advanceEating();
+        }
     }
 
-    /**
-     * Gives back some satisfaction (up to {@code MAX_SATISFACTION}), but only if the customer is still waiting for a
-     * table or food. Otherwise nothing happens.
-     *
-     * @param points how many points to give back
-     */
+    
     final void recoverIfWaiting(int points) {
-        // TODO
+        if (points < 0) {
+            throw new IllegalArgumentException(
+                    "Recovery points must not be negative."
+            );
+        }
+
+        if (state.isAwaitingService()) {
+            adjustSatisfaction(points);
+        }
     }
 
-    /**
-     * Waiting customer becomes SEATED after a staff member seats them.
-     */
     final void markSeated() {
-        // TODO
+        moveTo(CustomerState.SEATED);
     }
 
-    /**
-     * Saves the customer's order and moves them from SEATED to ORDERED.
-     *
-     * @param order the order the Waiter just took
-     */
     final void placeOrder(Order order) {
-        // TODO
+        Objects.requireNonNull(order, "Order must not be null.");
+
+        if (order.getCustomer() != this) {
+            throw new IllegalArgumentException(
+                    "The order belongs to a different customer."
+            );
+        }
+
+        if (this.order != null) {
+            throw new IllegalStateException(
+                    "This customer already has an order."
+            );
+        }
+
+        
+        moveTo(CustomerState.ORDERED);
+        this.order = order;
     }
 
-    /**
-     * Customer becomes SERVED once their READY order is brought out, so they can start eating.
-     */
     final void markServed() {
-        // TODO
+        moveTo(CustomerState.SERVED);
     }
 
-    /**
-     * Ready-to-pay customer becomes PAID after the Cashier takes the money.
-     */
     final void markPaid() {
-        // TODO
+        moveTo(CustomerState.PAID);
     }
 
-    /**
-     * Customer type shown on the turn display, like "Regular".
-     *
-     * @return the type name
-     */
     protected abstract String getTypeName();
 
-    /**
-     * How many satisfaction points this type of customer loses per turn of waiting.
-     *
-     * @return points lost per waiting turn
-     */
     protected abstract int getWaitingLoss();
 
-    /**
-     * Customer who was served on an earlier turn finishes eating and becomes READY_TO_PAY.
-     */
+    
     private void advanceEating() {
-        // TODO
+        if (state == CustomerState.SERVED) {
+            moveTo(CustomerState.EATING);
+        } else if (state == CustomerState.EATING) {
+            moveTo(CustomerState.READY_TO_PAY);
+        }
     }
 
-    /**
-     * Takes {@link #getWaitingLoss()} off satisfaction, and if it drops to 0 the customer becomes LEFT.
-     */
     private void applyWaitingLoss() {
-        // TODO
+        adjustSatisfaction(-getWaitingLoss());
+
+        if (satisfaction == 0) {
+            moveTo(CustomerState.LEFT);
+        }
     }
 
-    /**
-     * Changes state, but only if {@link CustomerState#canMoveTo(CustomerState)} allows it. Illegal moves get rejected.
-     *
-     * @param next the state to move to
-     */
     private void moveTo(CustomerState next) {
-        // TODO
+        if (!state.canMoveTo(next)) {
+            throw new IllegalStateException(
+                    "Illegal customer state transition: "
+                            + state + " -> " + next
+            );
+        }
+
+        state = next;
     }
 
-    /**
-     * Adds {@code delta} to satisfaction and keeps it between 0 and {@code MAX_SATISFACTION}.
-     *
-     * @param delta change in satisfaction (negative means a loss)
-     */
     private void adjustSatisfaction(int delta) {
-        // TODO
+        long adjusted = (long) satisfaction + delta;
+
+        satisfaction = (int) Math.max(
+                0L,
+                Math.min((long) MAX_SATISFACTION, adjusted)
+        );
     }
 }
