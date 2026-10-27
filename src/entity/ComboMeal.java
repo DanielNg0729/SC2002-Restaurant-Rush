@@ -32,8 +32,7 @@ public class ComboMeal implements MenuItem {
      */
     @Override
     public String getName() {
-        // TODO
-        return null;
+        return "Combo (" + components.get(0).getName() + " + " + components.get(1).getName() + ")";
     }
 
     /**
@@ -44,8 +43,8 @@ public class ComboMeal implements MenuItem {
      */
     @Override
     public int getPriceCents() {
-        // TODO
-        return 0;
+        int total = components.stream().mapToInt(Dish::getPriceCents).sum();
+        return PricingPolicy.applyPercent(total, PRICE_PERCENT);
     }
 
     /**
@@ -55,7 +54,6 @@ public class ComboMeal implements MenuItem {
      */
     @Override
     public int getPrepUnits() {
-        // TODO
-        return 0;
+        return components.stream().mapToInt(Dish::getPrepUnits).sum();
     }
 }

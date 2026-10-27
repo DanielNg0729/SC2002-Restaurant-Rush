@@ -38,8 +38,8 @@ public class HappyHour implements PricingPolicy {
      */
     @Override
     public int priceFor(MenuItem item, Customer customer) {
-        // TODO
-        return 0;
+        int basePrice = base.priceFor(item, customer);
+        return isActive() ? PricingPolicy.applyPercent(basePrice, PRICE_PERCENT) : basePrice;
     }
 
     /**
@@ -49,8 +49,12 @@ public class HappyHour implements PricingPolicy {
      * @return the result of trying to turn it on
      */
     public ActionResult activate() {
-        // TODO
-        return null;
+        if (used) {
+            return ActionResult.fail("Happy Hour has already been used this game.");
+        }
+        used = true;
+        remainingTurns = DURATION_TURNS;
+        return ActionResult.ok("Happy Hour is on for " + DURATION_TURNS + " turns!");
     }
 
     /**
@@ -60,14 +64,21 @@ public class HappyHour implements PricingPolicy {
      * @param customers customers currently in the queue or at tables
      */
     public void startTurn(List<Customer> customers) {
-        // TODO
+        if (!isActive()) {
+            return;
+        }
+        for (Customer customer : customers) {
+            customer.recoverIfWaiting(RECOVERY_POINTS);
+        }
     }
 
     /**
      * Counts down one turn at the end of the turn. Happy Hour stops when there are no turns left.
      */
     public void endTurn() {
-        // TODO
+        if (remainingTurns > 0) {
+            remainingTurns--;
+        }
     }
 
     /**
@@ -76,8 +87,7 @@ public class HappyHour implements PricingPolicy {
      * @return true if Happy Hour is on
      */
     public boolean isActive() {
-        // TODO
-        return false;
+        return remainingTurns > 0;
     }
 
     /**

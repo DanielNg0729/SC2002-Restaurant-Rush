@@ -23,7 +23,6 @@ public class StandardPricing implements PricingPolicy {
      */
     @Override
     public int priceFor(MenuItem item, Customer customer) {
-        // TODO
-        return 0;
+        return PricingPolicy.applyPercent(item.getPriceCents(), customer.getPricePercent());
     }
 }

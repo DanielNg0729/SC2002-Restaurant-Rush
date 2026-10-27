@@ -49,8 +49,7 @@ public class Order {
      * @return units left, 0 once the order is READY
      */
     public int getRemainingUnits() {
-        // TODO
-        return 0;
+        return Math.max(0, item.getPrepUnits() - unitsDone);
     }
 
     /**
@@ -59,8 +58,7 @@ public class Order {
      * @return true if the order is READY
      */
     public boolean isReady() {
-        // TODO
-        return false;
+        return status == OrderStatus.READY;
     }
 
     /**
@@ -69,35 +67,44 @@ public class Order {
      * @return true if the order still needs cooking
      */
     public boolean needsPreparation() {
-        // TODO
-        return false;
+        return status == OrderStatus.PLACED || status == OrderStatus.IN_PREPARATION;
     }
 
     /**
      * Finishes one prep unit. The order goes to IN_PREPARATION, then READY after the last unit.
      */
     void advancePreparation() {
-        // TODO
+        if (!needsPreparation()) {
+            return;
+        }
+        unitsDone++;
+        status = unitsDone >= item.getPrepUnits() ? OrderStatus.READY : OrderStatus.IN_PREPARATION;
     }
 
     /**
      * READY order becomes SERVED.
      */
     void markServed() {
-        // TODO
+        if (status == OrderStatus.READY) {
+            status = OrderStatus.SERVED;
+        }
     }
 
     /**
      * SERVED order becomes PAID after the Cashier records the payment.
      */
     void markPaid() {
-        // TODO
+        if (status == OrderStatus.SERVED) {
+            status = OrderStatus.PAID;
+        }
     }
 
     /**
      * Cancels an unfinished order when the customer leaves without paying.
      */
     void cancel() {
-        // TODO
+        if (status != OrderStatus.PAID && status != OrderStatus.CANCELLED) {
+            status = OrderStatus.CANCELLED;
+        }
     }
 }
