@@ -25,7 +25,6 @@ public interface PricingPolicy {
      * @return the rounded amount in cents
      */
     static int applyPercent(int cents, int percent) {
-        // TODO
-        return 0;
+        return (cents * percent + 50) / 100;
     }
 }
