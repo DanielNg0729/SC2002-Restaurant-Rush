@@ -1,10 +1,5 @@
 package entity;
 
-/**
- * All the stages a customer goes through, from arriving to paying (or leaving unhappy).
- *
- * @since Stage 1
- */
 public enum CustomerState {
     WAITING,
     SEATED,
@@ -15,27 +10,44 @@ public enum CustomerState {
     PAID,
     LEFT;
 
-    /**
-     * True while the customer is still waiting for a table or for food (WAITING, SEATED or ORDERED). These are the only
-     * states that lose satisfaction at the end of a turn.
-     *
-     * @return true if the customer is still waiting to be served
-     */
     public boolean isAwaitingService() {
-        // TODO
-        return false;
+        return this == WAITING
+                || this == SEATED
+                || this == ORDERED;
     }
 
-    /**
-     * Checks if we're allowed to go from this state to {@code next}. A customer can only move one step forward through
-     * WAITING, SEATED, ORDERED, SERVED, EATING, READY_TO_PAY, PAID, or go to LEFT while they're still waiting for
-     * service.
-     *
-     * @param next the state to move to
-     * @return true if the move is allowed
-     */
     public boolean canMoveTo(CustomerState next) {
-        // TODO
-        return false;
+        if (next == null) {
+            return false;
+        }
+
+        if (next == LEFT) {
+            return isAwaitingService();
+        }
+
+        switch (this) {
+            case WAITING:
+                return next == SEATED;
+
+            case SEATED:
+                return next == ORDERED;
+
+            case ORDERED:
+                return next == SERVED;
+
+            case SERVED:
+                return next == EATING;
+
+            case EATING:
+                return next == READY_TO_PAY;
+
+            case READY_TO_PAY:
+                return next == PAID;
+
+            case PAID:
+            case LEFT:
+            default:
+                return false;
+        }
     }
 }
