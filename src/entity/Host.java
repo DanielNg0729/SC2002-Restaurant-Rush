@@ -31,7 +31,6 @@ public class Host extends FrontOfHouseStaff {
      */
     @Override
     public List<StaffTask> listAvailableTasks(Restaurant restaurant) {
-        // TODO
-        return List.of();
+        return seatingTasks(restaurant);
     }
 }
