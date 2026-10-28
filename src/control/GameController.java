@@ -30,6 +30,7 @@ public class GameController {
     public GameController(Restaurant restaurant, ArrivalSchedule arrivalSchedule) {
         this.restaurant = restaurant;
         this.happyHour = new HappyHour(new StandardPricing());
+        this.restaurant.setPricing(this.happyHour);
         this.arrivalSchedule = arrivalSchedule;
     }
 
