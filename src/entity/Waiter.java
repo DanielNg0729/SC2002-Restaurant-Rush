@@ -1,5 +1,6 @@
 package entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,8 +33,25 @@ public class Waiter extends FrontOfHouseStaff {
      */
     @Override
     public List<StaffTask> listAvailableTasks(Restaurant restaurant) {
-        // TODO
-        return List.of();
+        if (!isAvailable()) {
+            return List.of();
+        }
+        List<StaffTask> tasks = new ArrayList<>(seatingTasks(restaurant));
+        for (Table table : restaurant.getTables()) {
+            table.getOccupant()
+                    .filter(customer -> customer.getState() == CustomerState.SEATED
+                            && customer.getOrder().isEmpty())
+                    .ifPresent(customer -> tasks.add(new StaffTask(
+                            "Take order from customer " + customer.getId(),
+                            () -> takeOrder(table, restaurant.getMenu(), restaurant.getPricing()))));
+        }
+        for (Order order : restaurant.getActiveOrders()) {
+            if (order.isReady() && order.getCustomer().getState() == CustomerState.ORDERED) {
+                tasks.add(new StaffTask("Serve customer " + order.getCustomer().getId(),
+                        () -> serve(order)));
+            }
+        }
+        return List.copyOf(tasks);
     }
 
     /**
@@ -46,8 +64,24 @@ public class Waiter extends FrontOfHouseStaff {
      * @return the result, with the item and bill if it worked
      */
     public ActionResult takeOrder(Table table, Menu menu, PricingPolicy pricing) {
-        // TODO
-        return null;
+        return performTask(() -> {
+            if (table == null || menu == null || pricing == null) {
+                return ActionResult.fail("A table, menu and pricing policy are required.");
+            }
+            Customer customer = table.getOccupant().orElse(null);
+            if (customer == null || customer.getState() != CustomerState.SEATED
+                    || customer.getOrder().isPresent()) {
+                return ActionResult.fail("The table needs a seated customer without an order.");
+            }
+            if (menu.getItems().isEmpty()) {
+                return ActionResult.fail("The menu is empty.");
+            }
+            MenuItem item = customer.chooseItem(menu);
+            int billCents = pricing.priceFor(item, customer);
+            customer.placeOrder(new Order(customer, item, billCents));
+            return ActionResult.ok("Customer " + customer.getId() + " ordered " + item.getName()
+                    + " for " + billCents + " cents.");
+        });
     }
 
     /**
@@ -57,7 +91,15 @@ public class Waiter extends FrontOfHouseStaff {
      * @return the result of trying to serve it
      */
     public ActionResult serve(Order order) {
-        // TODO
-        return null;
+        return performTask(() -> {
+            if (order == null || !order.isReady()
+                    || order.getCustomer().getState() != CustomerState.ORDERED
+                    || order.getCustomer().getOrder().orElse(null) != order) {
+                return ActionResult.fail("Only a customer's own READY order can be served.");
+            }
+            order.markServed();
+            order.getCustomer().markServed();
+            return ActionResult.ok("Served customer " + order.getCustomer().getId() + ".");
+        });
     }
 }
