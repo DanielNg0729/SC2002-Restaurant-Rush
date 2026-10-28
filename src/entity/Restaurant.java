@@ -14,6 +14,7 @@ public class Restaurant {
     private static final int TABLE_COUNT = 2;
 
     private final Menu menu;
+    private PricingPolicy pricing;
     private final List<Table> tables;
     private final WaitingQueue waitingQueue;
     private final SalesLedger ledger;
@@ -30,6 +31,7 @@ public class Restaurant {
      */
     public Restaurant(Menu menu) {
         this.menu = menu;
+        this.pricing = new StandardPricing();
         List<Table> created = new ArrayList<>();
         for (int number = 1; number <= TABLE_COUNT; number++) {
             created.add(new Table(number));
@@ -45,6 +47,27 @@ public class Restaurant {
 
     public Menu getMenu() {
         return menu;
+    }
+
+    /**
+     * Returns the policy used to price new orders.
+     *
+     * @return the current pricing policy
+     */
+    public PricingPolicy getPricing() {
+        return pricing;
+    }
+
+    /**
+     * Changes the policy used for future orders. Existing orders keep their quoted price.
+     *
+     * @param pricing the new pricing policy
+     */
+    public void setPricing(PricingPolicy pricing) {
+        if (pricing == null) {
+            throw new IllegalArgumentException("A pricing policy is required.");
+        }
+        this.pricing = pricing;
     }
 
     /**
