@@ -32,15 +32,22 @@ public abstract class Staff {
      * @return true if they can still act this turn
      */
     public final boolean isAvailable() {
-        // TODO
-        return false;
+        return !actedThisTurn;
     }
 
     /**
      * Resets the staff member at the start of a turn so they can act again.
      */
     public final void startTurn() {
-        // TODO
+        actedThisTurn = false;
+        onStartTurn();
+    }
+
+    /**
+     * Lets a role capture state at the start of the turn, before any staff act.
+     * The Cashier uses this to defer newly ready payments until the following turn.
+     */
+    protected void onStartTurn() {
     }
 
     /**
@@ -51,8 +58,14 @@ public abstract class Staff {
      * @return the action's result, or a failure if they've already acted
      */
     protected final ActionResult performTask(Supplier<ActionResult> action) {
-        // TODO
-        return null;
+        if (!isAvailable()) {
+            return ActionResult.fail(name + " has already acted this turn.");
+        }
+        ActionResult result = action.get();
+        if (result.isSuccess()) {
+            actedThisTurn = true;
+        }
+        return result;
     }
 
     /**

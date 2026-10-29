@@ -33,7 +33,6 @@ public class StaffTask {
      * @return the result of the action
      */
     public ActionResult execute() {
-        // TODO
-        return null;
+        return action.get();
     }
 }

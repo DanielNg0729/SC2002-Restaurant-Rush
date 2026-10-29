@@ -1,5 +1,6 @@
 package entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,8 +32,17 @@ public class Chef extends Staff {
      */
     @Override
     public List<StaffTask> listAvailableTasks(Restaurant restaurant) {
-        // TODO
-        return List.of();
+        if (!isAvailable()) {
+            return List.of();
+        }
+        List<StaffTask> tasks = new ArrayList<>();
+        for (Order order : restaurant.getActiveOrders()) {
+            if (order.needsPreparation() && order.getCustomer().getState() == CustomerState.ORDERED) {
+                tasks.add(new StaffTask("Prepare " + order.getItem().getName()
+                        + " for customer " + order.getCustomer().getId(), () -> prepare(order)));
+            }
+        }
+        return List.copyOf(tasks);
     }
 
     /**
@@ -43,7 +53,15 @@ public class Chef extends Staff {
      * @return the result of trying to prepare it
      */
     public ActionResult prepare(Order order) {
-        // TODO
-        return null;
+        return performTask(() -> {
+            if (order == null || !order.needsPreparation()
+                    || order.getCustomer().getState() != CustomerState.ORDERED
+                    || order.getCustomer().getOrder().orElse(null) != order) {
+                return ActionResult.fail("This order does not need preparation.");
+            }
+            order.advancePreparation();
+            return ActionResult.ok("Prepared one unit for customer " + order.getCustomer().getId()
+                    + "; " + order.getRemainingUnits() + " unit(s) remaining.");
+        });
     }
 }

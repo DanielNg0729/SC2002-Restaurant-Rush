@@ -1,5 +1,6 @@
 package entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,8 +30,22 @@ public abstract class FrontOfHouseStaff extends Staff {
      * @return the result of trying to seat them
      */
     public final ActionResult seat(Customer customer, WaitingQueue queue, Table table) {
-        // TODO
-        return null;
+        return performTask(() -> {
+            if (customer == null || queue == null || table == null) {
+                return ActionResult.fail("A customer, queue and table are required.");
+            }
+            if (!queue.contains(customer) || customer.getState() != CustomerState.WAITING) {
+                return ActionResult.fail("Customer is not waiting in this queue.");
+            }
+            if (!table.isFree()) {
+                return ActionResult.fail("Table " + table.getNumber() + " is already occupied.");
+            }
+            queue.remove(customer);
+            table.seat(customer);
+            customer.markSeated();
+            return ActionResult.ok("Seated customer " + customer.getId()
+                    + " at table " + table.getNumber() + ".");
+        });
     }
 
     /**
@@ -40,7 +55,23 @@ public abstract class FrontOfHouseStaff extends Staff {
      * @return the seating tasks (empty if nobody is waiting or no table is free)
      */
     protected List<StaffTask> seatingTasks(Restaurant restaurant) {
-        // TODO
-        return List.of();
+        if (!isAvailable() || restaurant.getFreeTables().isEmpty()) {
+            return List.of();
+        }
+        List<StaffTask> tasks = new ArrayList<>();
+        WaitingQueue queue = restaurant.getWaitingQueue();
+        for (Customer customer : queue.getCustomers()) {
+            if (customer.getState() == CustomerState.WAITING) {
+                tasks.add(new StaffTask("Seat customer " + customer.getId(), () -> {
+                    // Recheck the table when executed: another role may have seated someone.
+                    List<Table> freeTables = restaurant.getFreeTables();
+                    if (freeTables.isEmpty()) {
+                        return ActionResult.fail("No free table is available.");
+                    }
+                    return seat(customer, queue, freeTables.get(0));
+                }));
+            }
+        }
+        return List.copyOf(tasks);
     }
 }
