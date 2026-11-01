@@ -1,32 +1,33 @@
 package control;
 
+import boundary.RestaurantCLI;
 import entity.ActionResult;
+import entity.Customer;
+import entity.CustomerState;
 import entity.HappyHour;
 import entity.Restaurant;
+import entity.Staff;
+import entity.StaffTask;
 import entity.StandardPricing;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.OptionalDouble;
 
-/**
- * Runs the game turn by turn and decides if the player wins or loses. All the game rules live here, while the UI stuff
- * is in RestaurantCLI.
- *
- * @since Stage 1
- */
+/** Coordinates the 18-turn game. Rule decisions are handled here, not in the CLI. */
 public class GameController {
-
     private static final int MAX_TURNS = 18;
+    private static final int TARGET_PAID = 4;
+    private static final int TARGET_REVENUE_CENTS = 4500;
+    private static final int TARGET_AVG_SATISFACTION = 60;
 
     private final Restaurant restaurant;
     private final HappyHour happyHour;
     private final ArrivalSchedule arrivalSchedule;
+    private final List<Customer> arrivals = new ArrayList<>();
+    private RestaurantCLI ui;
     private int currentTurn;
+    private boolean happyHourUsed;
 
-    /**
-     * Sets up a new game. Happy Hour starts off unused and sits on top of standard pricing. (This constructor isn't on
-     * the class diagram.)
-     *
-     * @param restaurant      the restaurant we're playing in
-     * @param arrivalSchedule when customers arrive
-     */
     public GameController(Restaurant restaurant, ArrivalSchedule arrivalSchedule) {
         this.restaurant = restaurant;
         this.happyHour = new HappyHour(new StandardPricing());
@@ -34,74 +35,141 @@ public class GameController {
         this.arrivalSchedule = arrivalSchedule;
     }
 
-    /**
-     * Plays all {@code MAX_TURNS} turns one after another (the game never ends early) and returns the result.
-     *
-     * @return the result after the last turn
-     */
+    /** Connects the CLI to the controller without changing the existing constructors. */
+    public void setCLI(RestaurantCLI ui) {
+        if (ui == null) {
+            throw new IllegalArgumentException("A CLI is required.");
+        }
+        this.ui = ui;
+    }
+
+    public Restaurant getRestaurant() { return restaurant; }
+    public HappyHour getHappyHour() { return happyHour; }
+    public int getCurrentTurn() { return currentTurn; }
+    public int getServedCount() {
+        return (int) arrivals.stream().filter(customer ->
+                customer.getState() == CustomerState.SERVED
+                        || customer.getState() == CustomerState.EATING
+                        || customer.getState() == CustomerState.READY_TO_PAY
+                        || customer.getState() == CustomerState.PAID).count();
+    }
+
+    /** Plays all turns, even if the targets have already been met. */
     public GameResult runGame() {
-        // TODO
-        return null;
+        if (ui == null) {
+            throw new IllegalStateException("Connect a RestaurantCLI before starting.");
+        }
+        for (currentTurn = 1; currentTurn <= MAX_TURNS; currentTurn++) {
+            runTurn();
+        }
+        currentTurn = MAX_TURNS;
+        return checkResult();
     }
 
-    /**
-     * Plays a single turn: arrivals, the manager's choices (kitchen and serving), eating and paying, then the end of
-     * the turn.
-     */
     private void runTurn() {
-        // TODO
+        // Cashier needs to know the restaurant before its start-of-turn eligibility snapshot.
+        restaurant.getCashier().listAvailableTasks(restaurant);
+        for (Staff staff : restaurant.getAllStaff()) {
+            staff.startTurn();
+        }
+        offerHappyHour();
+        processArrival();
+        happyHour.startTurn(activeCustomers());
+        ui.displayTurnState();
+        processManagerChoices();
+        processEatingAndPayment();
+        processEndTurn();
+        happyHour.endTurn();
     }
 
-    /**
-     * Step 1. If a customer is due this turn, create them and put them in the waiting queue.
-     */
-    private void processArrival() {
-        // TODO
+    private List<Customer> activeCustomers() {
+        List<Customer> customers = new ArrayList<>(restaurant.getWaitingQueue().getCustomers());
+        customers.addAll(restaurant.getSeatedCustomers());
+        return customers;
     }
 
-    /**
-     * Steps 2 and 3. Asks the player what each role should do (or Wait) and runs it, Waiter first and then Chef. If a
-     * choice is invalid we say why and ask again, and the task isn't used up.
-     */
-    private void processManagerChoices() {
-        // TODO
+    private void offerHappyHour() {
+        if (happyHour.isActive()) {
+            ui.displayMessage("Happy Hour active: " + happyHour.getRemainingTurns() + " turn(s) remaining.");
+        } else if (!happyHourUsed && ui.chooseHappyHourActivation()) {
+            ActionResult result = activateHappyHour();
+            ui.displayMessage(result.getMessage());
+        }
     }
 
-    /**
-     * Step 4. Customers served on an earlier turn finish eating, then the Cashier takes at most one payment, starting
-     * with whoever has been ready to pay the longest.
-     */
-    private void processEatingAndPayment() {
-        // TODO
-    }
-
-    /**
-     * Step 5. Calls {@code endTurn()} on every customer in the queue or at a table, and removes anyone whose
-     * satisfaction hit 0.
-     */
-    private void processEndTurn() {
-        // TODO
-    }
-
-    /**
-     * Turns on Happy Hour for the current turn if the player asks for it and it hasn't been used yet.
-     *
-     * @return whether it worked, and why not if it didn't
-     * @since Stage 3
-     */
     private ActionResult activateHappyHour() {
-        // TODO
-        return null;
+        ActionResult result = happyHour.activate();
+        if (result.isSuccess()) { happyHourUsed = true; }
+        return result;
     }
 
-    /**
-     * Step 6. Works out the final result. To win you need at least 4 paid customers, at least $45 in revenue and an
-     * average paid satisfaction of 60 or more.
-     *
-     * @return the game result
-     */
+    private void processArrival() {
+        if (arrivalSchedule.isArrivalTurn(currentTurn)) {
+            Customer customer = arrivalSchedule.createCustomer(currentTurn);
+            arrivals.add(customer);
+            restaurant.getWaitingQueue().join(customer);
+            ui.displayMessage("Customer " + customer.getId() + " arrived.");
+        }
+    }
+
+    private void processManagerChoices() {
+        chooseAndRun(restaurant.getHost());
+        chooseAndRun(restaurant.getWaiter());
+        chooseAndRun(restaurant.getChef());
+    }
+
+    private void chooseAndRun(Staff staff) {
+        while (staff.isAvailable()) {
+            List<StaffTask> tasks = staff.listAvailableTasks(restaurant);
+            StaffTask chosen;
+            if (staff == restaurant.getHost()) {
+                chosen = ui.chooseHostTask(tasks);
+            } else if (staff == restaurant.getWaiter()) {
+                chosen = ui.chooseWaiterTask(tasks);
+            } else {
+                chosen = ui.chooseChefTask(tasks);
+            }
+            if (chosen == null) {
+                ui.displayMessage(staff.getRole() + " waits.");
+                return;
+            }
+            ActionResult result = chosen.execute();
+            ui.displayMessage(result.getMessage());
+            if (result.isSuccess()) {
+                return;
+            }
+            // An unsuccessful action does not use the task; present refreshed choices.
+        }
+    }
+
+    private void processEatingAndPayment() {
+        // Customer.endTurn() advances eating later in processEndTurn().
+        // The Cashier's startTurn() snapshot prevents charging anyone who only
+        // becomes READY_TO_PAY this turn.
+        ActionResult payment = restaurant.getCashier().processNextPayment(restaurant);
+        if (payment.isSuccess()) {
+            ui.displayMessage(payment.getMessage());
+        }
+    }
+
+    private void processEndTurn() {
+        for (Customer customer : activeCustomers()) {
+            customer.endTurn();
+            if (customer.hasLeft()) {
+                restaurant.removeLeavingCustomer(customer);
+                ui.displayMessage("Customer " + customer.getId() + " left unhappy.");
+            }
+        }
+    }
+
     private GameResult checkResult() {
-        // TODO
-        return null;
+        int paid = restaurant.getLedger().getPaidCount();
+        int revenue = restaurant.getLedger().getRevenueCents();
+        OptionalDouble average = restaurant.getLedger().getAverageSatisfaction();
+        boolean victory = paid >= TARGET_PAID && revenue >= TARGET_REVENUE_CENTS
+                && average.isPresent() && average.getAsDouble() >= TARGET_AVG_SATISFACTION;
+        int served = getServedCount();
+        return new GameResult(victory, paid, served, restaurant.getDepartureCount(),
+                revenue, average.orElse(Double.NaN), MAX_TURNS);
     }
 }
