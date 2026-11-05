@@ -2,11 +2,13 @@ package boundary;
 
 import control.GameController;
 import control.GameResult;
+import control.GameView;
 import entity.Customer;
 import entity.Restaurant;
 import entity.StaffTask;
 import entity.Table;
 import java.util.List;
+import java.util.OptionalDouble;
 import java.util.Scanner;
 
 /**
@@ -15,13 +17,13 @@ import java.util.Scanner;
  *
  * @since Stage 1
  */
-public class RestaurantCLI {
+public class RestaurantCLI implements GameView {
 
     private GameController controller;
     private final Scanner scanner = new Scanner(System.in);
 
     /**
-     * Makes the CLI for a game. (This constructor isn't on the class diagram.)
+     * Makes the CLI for a game.
      *
      * @param controller the controller running the game
      */
@@ -41,13 +43,14 @@ public class RestaurantCLI {
      * Prints what the player needs at the start of a turn: turn number, revenue, average paid satisfaction, the waiting
      * queue, who is at which table, each customer's satisfaction and order status, and what the staff can do.
      */
+    @Override
     public void displayTurnState() {
         Restaurant restaurant = controller.getRestaurant();
         int happyHourTurns = controller.getHappyHourRemainingTurns();
         System.out.println("\n========== TURN " + controller.getCurrentTurn() + " ==========");
         System.out.println("Revenue: " + dollars(restaurant.getLedger().getRevenueCents())
                 + " | Paid: " + restaurant.getLedger().getPaidCount()
-                + " | Average paid satisfaction: " + averageSatisfaction(restaurant));
+                + " | Average paid satisfaction: " + formatAverage(restaurant.getLedger().getAverageSatisfaction()));
         System.out.println("Happy Hour: " + (happyHourTurns > 0 ? happyHourTurns + " turn(s) remaining" : "inactive"));
         System.out.println("Waiting queue:");
         List<Customer> queue = restaurant.getWaitingQueue().getCustomers();
@@ -69,11 +72,26 @@ public class RestaurantCLI {
                 + ", Chef " + restaurant.getChef().listAvailableTasks(restaurant).size());
     }
 
+    /**
+     * Prints the running totals at the end of a turn: turn number, how many were served, how many left unhappy, revenue
+     * in dollars and average paid satisfaction (N/A if nobody has paid yet).
+     */
+    @Override
+    public void displayTurnSummary() {
+        Restaurant restaurant = controller.getRestaurant();
+        displayMessage("End of turn " + controller.getCurrentTurn()
+                + ": served " + controller.getServedCount()
+                + ", unhappy departures " + restaurant.getDepartureCount()
+                + ", revenue " + dollars(restaurant.getLedger().getRevenueCents())
+                + ", average paid satisfaction " + formatAverage(restaurant.getLedger().getAverageSatisfaction())
+                + ".");
+    }
+
     private String describe(Customer customer) {
         String order = customer.getOrder()
                 .map(o -> o.getItem().getName() + " [" + o.getStatus() + "]")
                 .orElse("no order");
-        return "Customer " + customer.getId() + " (" + customer.getClass().getSimpleName()
+        return "Customer " + customer.getId() + " (" + customer.getTypeName()
                 + ", satisfaction " + customer.getSatisfaction() + ", " + customer.getState()
                 + ", " + order + ")";
     }
@@ -85,6 +103,7 @@ public class RestaurantCLI {
      * @param tasks what the Waiter can do this turn
      * @return the task the player picked, or null for Wait
      */
+    @Override
     public StaffTask chooseWaiterTask(List<StaffTask> tasks) {
         return chooseTask("Waiter", tasks);
     }
@@ -97,6 +116,7 @@ public class RestaurantCLI {
      * @return the task the player picked, or null for Wait
      * @since Stage 3
      */
+    @Override
     public StaffTask chooseHostTask(List<StaffTask> tasks) {
         return chooseTask("Host", tasks);
     }
@@ -108,6 +128,7 @@ public class RestaurantCLI {
      * @param tasks what the Chef can do this turn
      * @return the task the player picked, or null for Wait
      */
+    @Override
     public StaffTask chooseChefTask(List<StaffTask> tasks) {
         return chooseTask("Chef", tasks);
     }
@@ -133,6 +154,7 @@ public class RestaurantCLI {
      * @return true if the player wants Happy Hour now
      * @since Stage 3
      */
+    @Override
     public boolean chooseHappyHourActivation() {
         while (true) {
             System.out.print("Activate Happy Hour for this and next turn? (y/n): ");
@@ -162,6 +184,7 @@ public class RestaurantCLI {
      *
      * @param message the text to print
      */
+    @Override
     public void displayMessage(String message) {
         System.out.println(message);
     }
@@ -173,20 +196,18 @@ public class RestaurantCLI {
      * @param result the final result of the game
      */
     public void displayResult(GameResult result) {
-        Restaurant restaurant = controller.getRestaurant();
         System.out.println("\n========== FINAL RESULT ==========");
         System.out.println(result.isVictory() ? "VICTORY" : "DEFEAT");
-        System.out.println("Served: " + controller.getServedCount());
-        System.out.println("Paid: " + restaurant.getLedger().getPaidCount());
-        System.out.println("Unhappy departures: " + restaurant.getDepartureCount());
-        System.out.println("Revenue: " + dollars(restaurant.getLedger().getRevenueCents()));
-        System.out.println("Average paid satisfaction: " + averageSatisfaction(restaurant));
-        System.out.println("Turns used: " + controller.getCurrentTurn());
+        System.out.println("Served: " + result.getServedCount());
+        System.out.println("Paid: " + result.getPaidCount());
+        System.out.println("Unhappy departures: " + result.getDepartureCount());
+        System.out.println("Revenue: " + dollars(result.getRevenueCents()));
+        System.out.println("Average paid satisfaction: " + formatAverage(result.getAverageSatisfaction()));
+        System.out.println("Turns used: " + result.getTurnsUsed());
     }
 
-    private String averageSatisfaction(Restaurant restaurant) {
-        return restaurant.getLedger().getAverageSatisfaction()
-                .stream().mapToObj(v -> String.format("%.1f", v)).findFirst().orElse("N/A");
+    private String formatAverage(OptionalDouble average) {
+        return average.stream().mapToObj(v -> String.format("%.1f", v)).findFirst().orElse("N/A");
     }
 
     private String dollars(int cents) {

@@ -19,7 +19,7 @@ java -cp out Main
 | 2 | Orders & pricing | | `Order`, `PricingPolicy`, `StandardPricing`, `ComboMeal`, `HappyHour` | 17 | 1 | `task2-pricing` |
 | 3 | Staff | | `Staff`, `StaffTask`, `FrontOfHouseStaff`, `Waiter`, `Chef`, `Cashier`, `Host` | 15 | 1, 2, 4 | `task3-staff` |
 | 4 | Restaurant floor | | `Table`, `WaitingQueue`, `SalesLedger`, `Restaurant`, `ArrivalSchedule` | 17 | 2 | `task4-restaurant` |
-| 5 | Game flow & CLI | | `GameController`, `RestaurantCLI`, `Game` | 16 | 1-4 | `task5-game` |
+| 5 | Game flow & CLI | | `GameController`, `GameView`, `RestaurantCLI`, `Game` | 16 | 1-4 | `task5-game` |
 
 Merge order: tasks 1, 2 and 4 first, then 3, then 5.
 
@@ -79,8 +79,10 @@ Merge order: tasks 1, 2 and 4 first, then 3, then 5.
 - `activateHappyHour`, and call `HappyHour.startTurn` / `endTurn` every turn.
 - `checkResult`: victory needs at least 4 paid customers, at least $45 revenue and an average paid satisfaction of
   at least 60.
-- `RestaurantCLI`: `run`, `displayTurnState`, `chooseWaiterTask` / `chooseHostTask` / `chooseChefTask` (list the
-  tasks plus Wait, ask again on bad input), `chooseHappyHourActivation`, `displayMessage`, `displayResult`.
+- `GameView`: what the controller needs from a UI, so it doesn't depend on the concrete CLI.
+- `RestaurantCLI` implements `GameView`: `run`, `displayTurnState`, `displayTurnSummary`, `chooseWaiterTask` /
+  `chooseHostTask` / `chooseChefTask` (list the tasks plus Wait, ask again on bad input), `chooseHappyHourActivation`,
+  `displayMessage`, `displayResult`.
 
 ## Rules
 

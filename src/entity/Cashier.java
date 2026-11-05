@@ -1,44 +1,17 @@
 package entity;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * The Cashier. Takes at most one payment per turn on their own, starting with whoever has been ready to pay the
- * longest. The game must check payments every turn, including the first turn when
- * nobody is ready, and reset staff before any customer or staff actions. This binds
- * the restaurant before later startTurn snapshots capture eligible customers.
+ * The Cashier. Takes at most one payment per turn on their own, oldest customer first. Customers only become
+ * READY_TO_PAY in {@link Customer#endTurn()}, which the game runs after payments, so anyone who becomes ready this turn
+ * pays next turn at the earliest.
  *
  * @since Stage 1
  */
 public class Cashier extends Staff {
-
-    private Restaurant restaurantForPayments;
-    private final List<Customer> readyToPayInOrder = new ArrayList<>();
-
-    /**
-     * Snapshot before anyone acts. Customers becoming ready later this turn are
-     * deliberately excluded until the next startTurn call.
-     */
-    @Override
-    protected void onStartTurn() {
-        if (restaurantForPayments != null) {
-            refreshReadyToPay();
-        }
-    }
-
-    private void refreshReadyToPay() {
-        readyToPayInOrder.removeIf(customer -> !customer.isReadyToPay()
-                || restaurantForPayments.findTableOf(customer).isEmpty());
-        restaurantForPayments.getSeatedCustomers().stream()
-                .filter(Customer::isReadyToPay)
-                .filter(customer -> !readyToPayInOrder.contains(customer))
-                .sorted(Comparator.comparingInt(Customer::getArrivalTurn)
-                        .thenComparingInt(Customer::getId))
-                .forEach(readyToPayInOrder::add);
-    }
 
     /**
      * Package-private because only Restaurant creates staff.
@@ -71,8 +44,8 @@ public class Cashier extends Staff {
     }
 
     /**
-     * Takes payment from the customer who has been READY_TO_PAY the longest (since an earlier turn). Records the locked
-     * bill and their satisfaction in the ledger, marks the order and the customer PAID, and frees up the table.
+     * Takes payment from the oldest READY_TO_PAY customer. Records the locked bill and their satisfaction in the ledger,
+     * marks the order and the customer PAID, and frees up the table.
      *
      * @param restaurant the restaurant whose ledger and tables get updated
      * @return the result, with the amount paid if it worked
@@ -93,28 +66,20 @@ public class Cashier extends Staff {
             order.markPaid();
             customer.markPaid();
             table.release();
-            readyToPayInOrder.remove(customer);
             return ActionResult.ok("Customer " + customer.getId() + " paid "
                     + order.getBillCents() + " cents.");
         });
     }
 
     /**
-     * Finds the customer who has been waiting to pay the longest, if there is one.
+     * Finds the oldest seated customer who is ready to pay: earliest arrival turn, then lowest id.
      *
      * @param restaurant the restaurant to check
      * @return that customer, or empty if nobody is ready to pay
      */
     private Optional<Customer> oldestReadyToPay(Restaurant restaurant) {
-        if (restaurantForPayments == null) {
-            // Bind on the first payment check (including a check with nobody ready).
-            restaurantForPayments = restaurant;
-        } else if (restaurantForPayments != restaurant) {
-            throw new IllegalArgumentException("A Cashier belongs to one restaurant.");
-        }
-        return readyToPayInOrder.stream()
+        return restaurant.getSeatedCustomers().stream()
                 .filter(Customer::isReadyToPay)
-                .filter(customer -> restaurant.findTableOf(customer).isPresent())
-                .findFirst();
+                .min(Comparator.comparingInt(Customer::getArrivalTurn).thenComparingInt(Customer::getId));
     }
 }

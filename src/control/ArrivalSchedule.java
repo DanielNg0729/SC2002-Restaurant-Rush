@@ -15,7 +15,7 @@ import java.util.List;
 public class ArrivalSchedule {
 
     /**
-     * Arrival number of the VIP. A VIP ordering a Burger shows the 10% discount ($13.50). (Not on the class diagram.)
+     * Arrival number of the VIP. A VIP ordering a Burger shows the 10% discount ($13.50).
      *
      * @since Stage 2
      */
@@ -23,7 +23,7 @@ public class ArrivalSchedule {
 
     /**
      * Arrival number of the Critic. They arrive late and order the most expensive item, so the player has to rush
-     * them to get paid by turn 18. (Not on the class diagram.)
+     * them to get paid by turn 18.
      *
      * @since Stage 2
      */
@@ -32,7 +32,7 @@ public class ArrivalSchedule {
     private final List<Integer> arrivalTurns;
 
     /**
-     * Makes the schedule. (This constructor isn't on the class diagram.)
+     * Makes the schedule.
      *
      * @param arrivalTurns turns where one customer shows up, in increasing order
      */

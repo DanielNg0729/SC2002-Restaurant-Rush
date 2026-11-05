@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * Puts the base-setting game together (menu, restaurant, arrival schedule, controller and CLI) so Main doesn't need
- * to know how any of it is built.
+ * to know how any of it is built. This is the only class in {@code control} that knows the concrete CLI.
  *
  * @since Stage 1
  */
@@ -30,7 +30,7 @@ public final class Game {
         ArrivalSchedule arrivalSchedule = new ArrivalSchedule(ARRIVAL_TURNS);
         GameController controller = new GameController(restaurant, arrivalSchedule);
         RestaurantCLI cli = new RestaurantCLI(controller);
-        controller.setCli(cli);
+        controller.setView(cli);
         cli.run();
     }
 
