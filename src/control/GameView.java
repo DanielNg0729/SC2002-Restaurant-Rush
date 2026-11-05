@@ -17,6 +17,11 @@ public interface GameView {
     void displayTurnState();
 
     /**
+     * Shows the player the running totals at the end of a turn.
+     */
+    void displayTurnSummary();
+
+    /**
      * Asks what the Waiter should do.
      *
      * @param tasks what the Waiter can do this turn

@@ -1,5 +1,7 @@
 package control;
 
+import java.util.OptionalDouble;
+
 /**
  * Final outcome of a game (win or lose) plus the numbers we show at the end.
  *
@@ -39,5 +41,34 @@ public class GameResult {
 
     public boolean isVictory() {
         return victory;
+    }
+
+    public int getPaidCount() {
+        return paidCount;
+    }
+
+    public int getServedCount() {
+        return servedCount;
+    }
+
+    public int getDepartureCount() {
+        return departureCount;
+    }
+
+    public int getRevenueCents() {
+        return revenueCents;
+    }
+
+    /**
+     * Average satisfaction of paying customers, taken when they paid. Empty if nobody paid, which shows up as N/A.
+     *
+     * @return average paid satisfaction
+     */
+    public OptionalDouble getAverageSatisfaction() {
+        return paidCount == 0 ? OptionalDouble.empty() : OptionalDouble.of(averageSatisfaction);
+    }
+
+    public int getTurnsUsed() {
+        return turnsUsed;
     }
 }

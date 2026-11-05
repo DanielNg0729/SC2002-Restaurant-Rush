@@ -4,7 +4,6 @@ import entity.ActionResult;
 import entity.Customer;
 import entity.HappyHour;
 import entity.Restaurant;
-import entity.SalesLedger;
 import entity.Staff;
 import entity.StaffTask;
 import entity.StandardPricing;
@@ -181,7 +180,7 @@ public class GameController {
             }
         }
         happyHour.endTurn();
-        view.displayMessage(turnSummary());
+        view.displayTurnSummary();
     }
 
     /**
@@ -238,21 +237,5 @@ public class GameController {
         List<Customer> customers = new ArrayList<>(restaurant.getWaitingQueue().getCustomers());
         customers.addAll(restaurant.getSeatedCustomers());
         return customers;
-    }
-
-    /**
-     * The numbers shown at the end of every turn. The average is N/A until someone has paid. (Not on the class
-     * diagram.)
-     *
-     * @return the summary line
-     */
-    private String turnSummary() {
-        SalesLedger ledger = restaurant.getLedger();
-        int revenue = ledger.getRevenueCents();
-        OptionalDouble average = ledger.getAverageSatisfaction();
-        return String.format("End of turn %d: served %d, unhappy departures %d, revenue $%d.%02d, "
-                + "average paid satisfaction %s.",
-                currentTurn, getServedCount(), restaurant.getDepartureCount(), revenue / 100, revenue % 100,
-                average.isPresent() ? String.format("%.1f", average.getAsDouble()) : "N/A");
     }
 }

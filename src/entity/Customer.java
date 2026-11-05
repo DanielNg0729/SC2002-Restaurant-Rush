@@ -135,7 +135,7 @@ public abstract class Customer {
         moveTo(CustomerState.PAID);
     }
 
-    protected abstract String getTypeName();
+    public abstract String getTypeName();
 
     protected abstract int getWaitingLoss();
 

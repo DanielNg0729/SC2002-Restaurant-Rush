@@ -12,7 +12,7 @@ public class CriticCustomer extends Customer {
     }
 
     @Override
-    protected String getTypeName() {
+    public String getTypeName() {
         return "Critic";
     }
 

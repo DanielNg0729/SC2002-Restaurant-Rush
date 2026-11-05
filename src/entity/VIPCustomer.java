@@ -10,7 +10,7 @@ public class VIPCustomer extends Customer {
     }
 
     @Override
-    protected String getTypeName() {
+    public String getTypeName() {
         return "VIP";
     }
 

@@ -8,6 +8,7 @@ import entity.Restaurant;
 import entity.StaffTask;
 import entity.Table;
 import java.util.List;
+import java.util.OptionalDouble;
 import java.util.Scanner;
 
 /**
@@ -49,7 +50,7 @@ public class RestaurantCLI implements GameView {
         System.out.println("\n========== TURN " + controller.getCurrentTurn() + " ==========");
         System.out.println("Revenue: " + dollars(restaurant.getLedger().getRevenueCents())
                 + " | Paid: " + restaurant.getLedger().getPaidCount()
-                + " | Average paid satisfaction: " + averageSatisfaction(restaurant));
+                + " | Average paid satisfaction: " + formatAverage(restaurant.getLedger().getAverageSatisfaction()));
         System.out.println("Happy Hour: " + (happyHourTurns > 0 ? happyHourTurns + " turn(s) remaining" : "inactive"));
         System.out.println("Waiting queue:");
         List<Customer> queue = restaurant.getWaitingQueue().getCustomers();
@@ -71,11 +72,26 @@ public class RestaurantCLI implements GameView {
                 + ", Chef " + restaurant.getChef().listAvailableTasks(restaurant).size());
     }
 
+    /**
+     * Prints the running totals at the end of a turn: turn number, how many were served, how many left unhappy, revenue
+     * in dollars and average paid satisfaction (N/A if nobody has paid yet).
+     */
+    @Override
+    public void displayTurnSummary() {
+        Restaurant restaurant = controller.getRestaurant();
+        displayMessage("End of turn " + controller.getCurrentTurn()
+                + ": served " + controller.getServedCount()
+                + ", unhappy departures " + restaurant.getDepartureCount()
+                + ", revenue " + dollars(restaurant.getLedger().getRevenueCents())
+                + ", average paid satisfaction " + formatAverage(restaurant.getLedger().getAverageSatisfaction())
+                + ".");
+    }
+
     private String describe(Customer customer) {
         String order = customer.getOrder()
                 .map(o -> o.getItem().getName() + " [" + o.getStatus() + "]")
                 .orElse("no order");
-        return "Customer " + customer.getId() + " (" + customer.getClass().getSimpleName()
+        return "Customer " + customer.getId() + " (" + customer.getTypeName()
                 + ", satisfaction " + customer.getSatisfaction() + ", " + customer.getState()
                 + ", " + order + ")";
     }
@@ -180,20 +196,18 @@ public class RestaurantCLI implements GameView {
      * @param result the final result of the game
      */
     public void displayResult(GameResult result) {
-        Restaurant restaurant = controller.getRestaurant();
         System.out.println("\n========== FINAL RESULT ==========");
         System.out.println(result.isVictory() ? "VICTORY" : "DEFEAT");
-        System.out.println("Served: " + controller.getServedCount());
-        System.out.println("Paid: " + restaurant.getLedger().getPaidCount());
-        System.out.println("Unhappy departures: " + restaurant.getDepartureCount());
-        System.out.println("Revenue: " + dollars(restaurant.getLedger().getRevenueCents()));
-        System.out.println("Average paid satisfaction: " + averageSatisfaction(restaurant));
-        System.out.println("Turns used: " + controller.getCurrentTurn());
+        System.out.println("Served: " + result.getServedCount());
+        System.out.println("Paid: " + result.getPaidCount());
+        System.out.println("Unhappy departures: " + result.getDepartureCount());
+        System.out.println("Revenue: " + dollars(result.getRevenueCents()));
+        System.out.println("Average paid satisfaction: " + formatAverage(result.getAverageSatisfaction()));
+        System.out.println("Turns used: " + result.getTurnsUsed());
     }
 
-    private String averageSatisfaction(Restaurant restaurant) {
-        return restaurant.getLedger().getAverageSatisfaction()
-                .stream().mapToObj(v -> String.format("%.1f", v)).findFirst().orElse("N/A");
+    private String formatAverage(OptionalDouble average) {
+        return average.stream().mapToObj(v -> String.format("%.1f", v)).findFirst().orElse("N/A");
     }
 
     private String dollars(int cents) {
