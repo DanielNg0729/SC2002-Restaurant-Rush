@@ -18,7 +18,7 @@ public class GameResult {
     private final int turnsUsed;
 
     /**
-     * Only GameController makes these, so the constructor is package-private. (It isn't on the class diagram.)
+     * Only GameController makes these, so the constructor is package-private.
      *
      * @param victory             true if all three targets were hit
      * @param paidCount           how many customers paid

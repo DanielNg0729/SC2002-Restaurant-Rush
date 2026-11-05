@@ -23,7 +23,7 @@ public class RestaurantCLI implements GameView {
     private final Scanner scanner = new Scanner(System.in);
 
     /**
-     * Makes the CLI for a game. (This constructor isn't on the class diagram.)
+     * Makes the CLI for a game.
      *
      * @param controller the controller running the game
      */

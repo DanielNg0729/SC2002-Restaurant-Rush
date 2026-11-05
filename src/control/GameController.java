@@ -22,7 +22,7 @@ public class GameController {
 
     private static final int MAX_TURNS = 18;
 
-    /** Victory targets used by {@link #checkResult()}. (Not on the class diagram.) */
+    /** Victory targets used by {@link #checkResult()}. */
     private static final int TARGET_PAID = 4;
     private static final int TARGET_REVENUE_CENTS = 4500;
     private static final int TARGET_AVG_SATISFACTION = 60;
@@ -33,13 +33,12 @@ public class GameController {
     private int currentTurn;
 
     /**
-     * The UI this controller asks for choices and shows the game on. (Not on the class diagram.)
+     * The UI this controller asks for choices and shows the game on.
      */
     private GameView view;
 
     /**
-     * Sets up a new game. Happy Hour starts off unused and sits on top of standard pricing. (This constructor isn't on
-     * the class diagram.)
+     * Sets up a new game. Happy Hour starts off unused and sits on top of standard pricing.
      *
      * @param restaurant      the restaurant we're playing in
      * @param arrivalSchedule when customers arrive
@@ -52,8 +51,7 @@ public class GameController {
     }
 
     /**
-     * Connects the UI. Game calls this while putting everything together, before {@link #runGame()}. (Not on the class
-     * diagram.)
+     * Connects the UI. Game calls this while putting everything together, before {@link #runGame()}.
      *
      * @param view the UI that asks the player and shows messages
      */
@@ -62,7 +60,7 @@ public class GameController {
     }
 
     /**
-     * The restaurant, so the UI can show its state. (Not on the class diagram.)
+     * The restaurant, so the UI can show its state.
      *
      * @return the restaurant we're playing in
      */
@@ -71,7 +69,7 @@ public class GameController {
     }
 
     /**
-     * How many Happy Hour turns are left, for the display. (Not on the class diagram.)
+     * How many Happy Hour turns are left, for the display.
      *
      * @return turns left, or 0 if it's off
      */
@@ -80,8 +78,7 @@ public class GameController {
     }
 
     /**
-     * The turn being played, for the display. It stays on the last turn once the game is over. (Not on the class
-     * diagram.)
+     * The turn being played, for the display. It stays on the last turn once the game is over.
      *
      * @return the current turn number
      */
@@ -91,7 +88,7 @@ public class GameController {
 
     /**
      * How many customers have been served so far. A served customer can't leave and keeps their table until they pay,
-     * so this is everyone who paid plus everyone at a table who isn't awaiting service. (Not on the class diagram.)
+     * so this is everyone who paid plus everyone at a table who isn't awaiting service.
      *
      * @return the served count
      */
@@ -211,7 +208,7 @@ public class GameController {
 
     /**
      * Asks the player for one staff member's task and runs it. A failed task doesn't use up their turn, so we show why
-     * and ask again. (Not on the class diagram.)
+     * and ask again.
      *
      * @param staff   the staff member acting
      * @param chooser the UI prompt for that role, which returns null for Wait
@@ -228,8 +225,7 @@ public class GameController {
     }
 
     /**
-     * Everyone in the queue or at a table. This is a copy, so customers can leave while we go through it. (Not on the
-     * class diagram.)
+     * Everyone in the queue or at a table. This is a copy, so customers can leave while we go through it.
      *
      * @return the active customers
      */
