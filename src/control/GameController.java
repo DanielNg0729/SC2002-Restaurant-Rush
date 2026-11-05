@@ -158,9 +158,9 @@ public class GameController {
     }
 
     /**
-     * Step 4. The Cashier takes at most one payment, starting with whoever has been ready to pay the longest. Eating
-     * moves forward in {@code Customer.endTurn()} (see {@link #processEndTurn()}), and the Cashier's start-of-turn
-     * snapshot means someone who becomes READY_TO_PAY this turn pays next turn at the earliest.
+     * Step 4. The Cashier takes at most one payment, oldest customer first. Eating moves forward later, in
+     * {@code Customer.endTurn()} (see {@link #processEndTurn()}). Payment has to stay before that step, because this
+     * order is what makes someone who becomes READY_TO_PAY this turn pay next turn at the earliest.
      */
     private void processEatingAndPayment() {
         ActionResult payment = restaurant.getCashier().processNextPayment(restaurant);

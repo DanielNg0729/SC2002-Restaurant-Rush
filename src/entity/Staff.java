@@ -40,14 +40,6 @@ public abstract class Staff {
      */
     public final void startTurn() {
         actedThisTurn = false;
-        onStartTurn();
-    }
-
-    /**
-     * Lets a role capture state at the start of the turn, before any staff act.
-     * The Cashier uses this to defer newly ready payments until the following turn.
-     */
-    protected void onStartTurn() {
     }
 
     /**
