@@ -29,7 +29,9 @@ public final class Game {
         Restaurant restaurant = new Restaurant(createMenu());
         ArrivalSchedule arrivalSchedule = new ArrivalSchedule(ARRIVAL_TURNS);
         GameController controller = new GameController(restaurant, arrivalSchedule);
-        new RestaurantCLI(controller).run();
+        RestaurantCLI cli = new RestaurantCLI(controller);
+        controller.setCli(cli);
+        cli.run();
     }
 
     /**

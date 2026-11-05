@@ -3,8 +3,6 @@ package boundary;
 import control.GameController;
 import control.GameResult;
 import entity.Customer;
-import entity.HappyHour;
-import entity.Order;
 import entity.Restaurant;
 import entity.StaffTask;
 import entity.Table;
@@ -13,12 +11,12 @@ import java.util.Scanner;
 
 /** Console-only presentation and input. Restaurant rules stay in GameController and entities. */
 public class RestaurantCLI {
-    private final GameController controller;
+
+    private GameController controller;
     private final Scanner scanner = new Scanner(System.in);
 
     public RestaurantCLI(GameController controller) {
         this.controller = controller;
-        controller.setCLI(this);
     }
 
     public void run() {
@@ -28,15 +26,12 @@ public class RestaurantCLI {
 
     public void displayTurnState() {
         Restaurant restaurant = controller.getRestaurant();
-        HappyHour happyHour = controller.getHappyHour();
-        System.out.println("\n========== TURN " + controller.getCurrentTurn() + "/18 ==========");
+        int happyHourTurns = controller.getHappyHourRemainingTurns();
+        System.out.println("\n========== TURN " + controller.getCurrentTurn() + " ==========");
         System.out.println("Revenue: " + dollars(restaurant.getLedger().getRevenueCents())
                 + " | Paid: " + restaurant.getLedger().getPaidCount()
-                + " | Average paid satisfaction: "
-                + restaurant.getLedger().getAverageSatisfaction()
-                        .stream().mapToObj(v -> String.format("%.1f", v)).findFirst().orElse("N/A"));
-        System.out.println("Happy Hour: " + (happyHour.isActive()
-                ? happyHour.getRemainingTurns() + " turn(s) remaining" : "inactive"));
+                + " | Average paid satisfaction: " + averageSatisfaction(restaurant));
+        System.out.println("Happy Hour: " + (happyHourTurns > 0 ? happyHourTurns + " turn(s) remaining" : "inactive"));
         System.out.println("Waiting queue:");
         List<Customer> queue = restaurant.getWaitingQueue().getCustomers();
         if (queue.isEmpty()) {
@@ -129,10 +124,13 @@ public class RestaurantCLI {
         System.out.println("Paid: " + restaurant.getLedger().getPaidCount());
         System.out.println("Unhappy departures: " + restaurant.getDepartureCount());
         System.out.println("Revenue: " + dollars(restaurant.getLedger().getRevenueCents()));
-        System.out.println("Average paid satisfaction: "
-                + restaurant.getLedger().getAverageSatisfaction()
-                        .stream().mapToObj(v -> String.format("%.1f", v)).findFirst().orElse("N/A"));
+        System.out.println("Average paid satisfaction: " + averageSatisfaction(restaurant));
         System.out.println("Turns used: " + controller.getCurrentTurn());
+    }
+
+    private String averageSatisfaction(Restaurant restaurant) {
+        return restaurant.getLedger().getAverageSatisfaction()
+                .stream().mapToObj(v -> String.format("%.1f", v)).findFirst().orElse("N/A");
     }
 
     private String dollars(int cents) {
