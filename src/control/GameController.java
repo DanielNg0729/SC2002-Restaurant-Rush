@@ -1,6 +1,5 @@
 package control;
 
-import boundary.RestaurantCLI;
 import entity.ActionResult;
 import entity.Customer;
 import entity.HappyHour;
@@ -16,7 +15,7 @@ import java.util.function.Function;
 
 /**
  * Runs the game turn by turn and decides if the player wins or loses. All the game rules live here, while the UI stuff
- * is in RestaurantCLI.
+ * is behind GameView.
  *
  * @since Stage 1
  */
@@ -35,9 +34,9 @@ public class GameController {
     private int currentTurn;
 
     /**
-     * The CLI this controller calls for prompts and messages, as in the sequence diagram. (Not on the class diagram.)
+     * The UI this controller asks for choices and shows the game on. (Not on the class diagram.)
      */
-    private RestaurantCLI cli;
+    private GameView view;
 
     /**
      * Sets up a new game. Happy Hour starts off unused and sits on top of standard pricing. (This constructor isn't on
@@ -54,17 +53,17 @@ public class GameController {
     }
 
     /**
-     * Connects the CLI. Game calls this while putting everything together, before {@link #runGame()}. (Not on the class
+     * Connects the UI. Game calls this while putting everything together, before {@link #runGame()}. (Not on the class
      * diagram.)
      *
-     * @param cli the CLI that asks the player and shows messages
+     * @param view the UI that asks the player and shows messages
      */
-    void setCli(RestaurantCLI cli) {
-        this.cli = cli;
+    void setView(GameView view) {
+        this.view = view;
     }
 
     /**
-     * The restaurant, so the CLI can show its state. (Not on the class diagram.)
+     * The restaurant, so the UI can show its state. (Not on the class diagram.)
      *
      * @return the restaurant we're playing in
      */
@@ -125,12 +124,12 @@ public class GameController {
         for (Staff staff : restaurant.getAllStaff()) {
             staff.startTurn();
         }
-        if (cli.chooseHappyHourActivation()) {
-            cli.displayMessage(activateHappyHour().getMessage());
+        if (view.chooseHappyHourActivation()) {
+            view.displayMessage(activateHappyHour().getMessage());
         }
         processArrival();
         happyHour.startTurn(activeCustomers());
-        cli.displayTurnState();
+        view.displayTurnState();
         processManagerChoices();
         processEatingAndPayment();
         processEndTurn();
@@ -143,7 +142,7 @@ public class GameController {
         if (arrivalSchedule.isArrivalTurn(currentTurn)) {
             Customer customer = arrivalSchedule.createCustomer(currentTurn);
             restaurant.getWaitingQueue().join(customer);
-            cli.displayMessage("Customer " + customer.getId() + " arrived.");
+            view.displayMessage("Customer " + customer.getId() + " arrived.");
         }
     }
 
@@ -152,9 +151,9 @@ public class GameController {
      * Chef. If a choice is invalid we say why and ask again, and the task isn't used up.
      */
     private void processManagerChoices() {
-        runChosenTask(restaurant.getHost(), cli::chooseHostTask);
-        runChosenTask(restaurant.getWaiter(), cli::chooseWaiterTask);
-        runChosenTask(restaurant.getChef(), cli::chooseChefTask);
+        runChosenTask(restaurant.getHost(), view::chooseHostTask);
+        runChosenTask(restaurant.getWaiter(), view::chooseWaiterTask);
+        runChosenTask(restaurant.getChef(), view::chooseChefTask);
     }
 
     /**
@@ -165,7 +164,7 @@ public class GameController {
     private void processEatingAndPayment() {
         ActionResult payment = restaurant.getCashier().processNextPayment(restaurant);
         if (payment.isSuccess()) {
-            cli.displayMessage(payment.getMessage());
+            view.displayMessage(payment.getMessage());
         }
     }
 
@@ -178,11 +177,11 @@ public class GameController {
             customer.endTurn();
             if (customer.hasLeft()) {
                 restaurant.removeLeavingCustomer(customer);
-                cli.displayMessage("Customer " + customer.getId() + " left unhappy.");
+                view.displayMessage("Customer " + customer.getId() + " left unhappy.");
             }
         }
         happyHour.endTurn();
-        cli.displayMessage(turnSummary());
+        view.displayMessage(turnSummary());
     }
 
     /**
@@ -216,16 +215,16 @@ public class GameController {
      * and ask again. (Not on the class diagram.)
      *
      * @param staff   the staff member acting
-     * @param chooser the CLI prompt for that role, which returns null for Wait
+     * @param chooser the UI prompt for that role, which returns null for Wait
      */
     private void runChosenTask(Staff staff, Function<List<StaffTask>, StaffTask> chooser) {
         while (staff.isAvailable()) {
             StaffTask chosen = chooser.apply(staff.listAvailableTasks(restaurant));
             if (chosen == null) {
-                cli.displayMessage(staff.getRole() + " waits.");
+                view.displayMessage(staff.getRole() + " waits.");
                 return;
             }
-            cli.displayMessage(chosen.execute().getMessage());
+            view.displayMessage(chosen.execute().getMessage());
         }
     }
 

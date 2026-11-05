@@ -2,6 +2,7 @@ package boundary;
 
 import control.GameController;
 import control.GameResult;
+import control.GameView;
 import entity.Customer;
 import entity.Restaurant;
 import entity.StaffTask;
@@ -15,7 +16,7 @@ import java.util.Scanner;
  *
  * @since Stage 1
  */
-public class RestaurantCLI {
+public class RestaurantCLI implements GameView {
 
     private GameController controller;
     private final Scanner scanner = new Scanner(System.in);
@@ -41,6 +42,7 @@ public class RestaurantCLI {
      * Prints what the player needs at the start of a turn: turn number, revenue, average paid satisfaction, the waiting
      * queue, who is at which table, each customer's satisfaction and order status, and what the staff can do.
      */
+    @Override
     public void displayTurnState() {
         Restaurant restaurant = controller.getRestaurant();
         int happyHourTurns = controller.getHappyHourRemainingTurns();
@@ -85,6 +87,7 @@ public class RestaurantCLI {
      * @param tasks what the Waiter can do this turn
      * @return the task the player picked, or null for Wait
      */
+    @Override
     public StaffTask chooseWaiterTask(List<StaffTask> tasks) {
         return chooseTask("Waiter", tasks);
     }
@@ -97,6 +100,7 @@ public class RestaurantCLI {
      * @return the task the player picked, or null for Wait
      * @since Stage 3
      */
+    @Override
     public StaffTask chooseHostTask(List<StaffTask> tasks) {
         return chooseTask("Host", tasks);
     }
@@ -108,6 +112,7 @@ public class RestaurantCLI {
      * @param tasks what the Chef can do this turn
      * @return the task the player picked, or null for Wait
      */
+    @Override
     public StaffTask chooseChefTask(List<StaffTask> tasks) {
         return chooseTask("Chef", tasks);
     }
@@ -133,6 +138,7 @@ public class RestaurantCLI {
      * @return true if the player wants Happy Hour now
      * @since Stage 3
      */
+    @Override
     public boolean chooseHappyHourActivation() {
         while (true) {
             System.out.print("Activate Happy Hour for this and next turn? (y/n): ");
@@ -162,6 +168,7 @@ public class RestaurantCLI {
      *
      * @param message the text to print
      */
+    @Override
     public void displayMessage(String message) {
         System.out.println(message);
     }
