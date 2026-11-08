@@ -19,7 +19,7 @@ Choose Host action: Seated customer 1 at table 1.
 Waiter actions:
   0. Wait
   1. Take order from customer 1
-Choose Waiter action: Customer 1 ordered Salad for 900 cents.
+Choose Waiter action: Customer 1 ordered Salad for $9.00.
 
 Chef actions:
   0. Wait
@@ -94,13 +94,13 @@ Choose Host action: Seated customer 2 at table 2.
 Waiter actions:
   0. Wait
   1. Take order from customer 2
-Choose Waiter action: Customer 2 ordered Burger for 1080 cents.
+Choose Waiter action: Customer 2 ordered Burger for $10.80.
 
 Chef actions:
   0. Wait
   1. Prepare Burger for customer 2
 Choose Chef action: Prepared one unit for customer 2; 0 unit(s) remaining.
-Customer 1 paid 900 cents.
+Customer 1 paid $9.00.
 End of turn 4: served 1, unhappy departures 0, revenue $9.00, average paid satisfaction 92.0.
 Activate Happy Hour for this and next turn? (y/n): 
 ========== TURN 5 ==========
@@ -169,13 +169,13 @@ Choose Host action: Seated customer 3 at table 1.
 Waiter actions:
   0. Wait
   1. Take order from customer 3
-Choose Waiter action: Customer 3 ordered Pasta for 1800 cents.
+Choose Waiter action: Customer 3 ordered Pasta for $18.00.
 
 Chef actions:
   0. Wait
   1. Prepare Pasta for customer 3
 Choose Chef action: Prepared one unit for customer 3; 1 unit(s) remaining.
-Customer 2 paid 1080 cents.
+Customer 2 paid $10.80.
 End of turn 7: served 2, unhappy departures 0, revenue $19.80, average paid satisfaction 96.0.
 Activate Happy Hour for this and next turn? (y/n): 
 ========== TURN 8 ==========
@@ -245,7 +245,7 @@ Choose Host action: Seated customer 4 at table 2.
 Waiter actions:
   0. Wait
   1. Take order from customer 4
-Choose Waiter action: Customer 4 ordered Combo (Salad + Pasta) for 2430 cents.
+Choose Waiter action: Customer 4 ordered Combo (Salad + Pasta) for $24.30.
 
 Chef actions:
   0. Wait
@@ -275,7 +275,7 @@ Chef actions:
   0. Wait
   1. Prepare Combo (Salad + Pasta) for customer 4
 Choose Chef action: Prepared one unit for customer 4; 1 unit(s) remaining.
-Customer 3 paid 1800 cents.
+Customer 3 paid $18.00.
 End of turn 11: served 3, unhappy departures 0, revenue $37.80, average paid satisfaction 92.0.
 Activate Happy Hour for this and next turn? (y/n): 
 ========== TURN 12 ==========
@@ -322,7 +322,7 @@ Waiter actions:
   0. Wait
   1. Take order from customer 5
   2. Serve customer 4
-Choose Waiter action: Customer 5 ordered Combo (Salad + Pasta) for 2430 cents.
+Choose Waiter action: Customer 5 ordered Combo (Salad + Pasta) for $24.30.
 
 Chef actions:
   0. Wait
@@ -402,7 +402,7 @@ Choose Waiter action: Served customer 5.
 Chef actions:
   0. Wait
 Choose Chef action: Chef waits.
-Customer 4 paid 2430 cents.
+Customer 4 paid $24.30.
 End of turn 16: served 5, unhappy departures 0, revenue $62.10, average paid satisfaction 86.0.
 Activate Happy Hour for this and next turn? (y/n): 
 ========== TURN 17 ==========
@@ -423,7 +423,7 @@ Choose Host action: Seated customer 6 at table 2.
 Waiter actions:
   0. Wait
   1. Take order from customer 6
-Choose Waiter action: Customer 6 ordered Burger for 1500 cents.
+Choose Waiter action: Customer 6 ordered Burger for $15.00.
 
 Chef actions:
   0. Wait
@@ -453,7 +453,7 @@ Choose Waiter action: Served customer 6.
 Chef actions:
   0. Wait
 Choose Chef action: Chef waits.
-Customer 5 paid 2430 cents.
+Customer 5 paid $24.30.
 End of turn 18: served 6, unhappy departures 0, revenue $86.40, average paid satisfaction 81.6.
 
 ========== FINAL RESULT ==========

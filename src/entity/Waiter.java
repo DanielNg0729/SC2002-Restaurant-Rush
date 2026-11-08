@@ -79,8 +79,8 @@ public class Waiter extends FrontOfHouseStaff {
             MenuItem item = customer.chooseItem(menu);
             int billCents = pricing.priceFor(item, customer);
             customer.placeOrder(new Order(customer, item, billCents));
-            return ActionResult.ok("Customer " + customer.getId() + " ordered " + item.getName()
-                    + " for " + billCents + " cents.");
+            return ActionResult.ok(String.format("Customer %d ordered %s for $%d.%02d.",
+                    customer.getId(), item.getName(), billCents / 100, billCents % 100));
         });
     }
 
