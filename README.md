@@ -1,88 +1,84 @@
 # SC2002-Restaurant-Rush
 
-A turn-based restaurant management game in Java, split into `boundary`, `control` and `entity` packages.
-The skeleton follows the class diagram in `assets/diagrams/`. Every method left to write is marked `// TODO`,
-and its Javadoc explains what it has to do.
+A turn-based restaurant management game in Java with a command-line interface. The player is the manager and decides
+what the staff do on each turn. The code is split into `boundary`, `control` and `entity` packages.
+
+Repository: <https://github.com/DanielNg0729/SC2002-Restaurant-Rush>
 
 ## Build and run
+
+Needs Java 17 or later.
 
 ```bash
 javac -d out src/*.java src/boundary/*.java src/control/*.java src/entity/*.java
 java -cp out Main
 ```
 
-## Task split
+## Stages
 
-| # | Task | Owner | Files | TODOs | Uses methods from | Branch |
-| --- | --- | --- | --- | :---: | :---: | --- |
-| 1 | Customers | | `Customer`, `CustomerState`, `CriticCustomer` | 16 | - | `task1-customers` |
-| 2 | Orders & pricing | | `Order`, `PricingPolicy`, `StandardPricing`, `ComboMeal`, `HappyHour` | 17 | 1 | `task2-pricing` |
-| 3 | Staff | | `Staff`, `StaffTask`, `FrontOfHouseStaff`, `Waiter`, `Chef`, `Cashier`, `Host` | 15 | 1, 2, 4 | `task3-staff` |
-| 4 | Restaurant floor | | `Table`, `WaitingQueue`, `SalesLedger`, `Restaurant`, `ArrivalSchedule` | 17 | 2 | `task4-restaurant` |
-| 5 | Game flow & CLI | | `GameController`, `GameView`, `RestaurantCLI`, `Game` | 16 | 1-4 | `task5-game` |
+The game is built in stages. Each stage is a tagged version that compiles and plays on its own.
 
-Merge order: tasks 1, 2 and 4 first, then 3, then 5.
+| Stage | Tag | Adds |
+| --- | --- | --- |
+| 1. Basic operation | [`stage-1`](https://github.com/DanielNg0729/SC2002-Restaurant-Rush/tree/stage-1) | Regular customers, the menu, Waiter, Chef and Cashier, the full turn sequence, victory and defeat |
 
-### Task 1 - Customers
+To play a stage, check out its tag and build it as above, for example `git checkout stage-1`. Run `git checkout main`
+to come back.
 
-- `CustomerState`: `isAwaitingService()` is true for WAITING, SEATED and ORDERED. `canMoveTo(next)` allows one step
-  forward in the life cycle, or a move to LEFT while still awaiting service.
-- `Customer` state changes: `moveTo` (rejects illegal moves), `markSeated`, `placeOrder`, `markServed`, `markPaid`,
-  `isReadyToPay`, `hasLeft`.
-- Satisfaction: `adjustSatisfaction` (keep it between 0 and 100), `applyWaitingLoss` (LEFT at 0), `recoverIfWaiting`
-  (only while awaiting service).
-- `endTurn()`: a customer served on an earlier turn finishes eating (`advanceEating` to READY_TO_PAY). A customer
-  still awaiting service loses `getWaitingLoss()` points.
-- `chooseItem`: customer n orders menu item n, wrapping back to item 1. `CriticCustomer.chooseItem` picks the most
-  expensive item (the first one if there's a tie).
+## Stage 1: Basic restaurant operation
 
-### Task 2 - Orders & pricing
+**Base setting.** 18 turns, 2 tables, one Waiter, one Chef and one Cashier. One customer arrives at the start of turns
+1, 4, 7, 10, 13 and 16. The menu is Salad ($9.00, 1 prep unit), Burger ($15.00, 1) and Pasta ($18.00, 2).
 
-- `Order`: `getRemainingUnits`, `isReady`, `needsPreparation`, `advancePreparation` (PLACED, then IN_PREPARATION,
-  then READY), `markServed`, `markPaid`, `cancel`.
-- `PricingPolicy.applyPercent`: `(cents * percent + 50) / 100`.
-- `StandardPricing.priceFor`: item price with the customer's `getPricePercent()` applied.
-- `ComboMeal` (Stage 3): name `Combo (Salad + Pasta)`, 90% of both prices (2430 cents), prep units added (3).
-- `HappyHour` (Stage 3): `activate` works once per game and lasts 2 turns. `priceFor` takes 20% off the base price
-  (VIP discount first). `startTurn` gives +15 satisfaction to waiting customers. `endTurn` counts down. `isActive`.
+**A turn.** The start of each turn shows the turn number, revenue, average paid satisfaction, the waiting queue, the
+tables, each customer's satisfaction and order status, and how many tasks each staff member has. Then:
 
-### Task 3 - Staff
+1. **Arrival.** The scheduled customer joins the waiting queue with satisfaction 100.
+2. **Waiter.** The player picks one task: seat a queued customer at a free table, take a seated customer's order,
+   serve a READY order, or Wait.
+3. **Chef.** The player picks one prep unit on one order, or Wait. The Chef acts after the Waiter, so the Chef can
+   start an order taken this turn, and a dish that becomes READY this turn is served next turn at the earliest.
+4. **Payment.** The Cashier takes at most one payment on its own, from the earliest-arriving customer who is
+   READY_TO_PAY. The bill goes into revenue, the customer and order become PAID and the table is freed.
+5. **End of turn.** A customer served on turn t eats during turn t + 1 and pays on turn t + 2 at the earliest. Every
+   customer still waiting for a table or for food loses 8 satisfaction. A customer who reaches 0 leaves without
+   paying: their unfinished order is cancelled and their table is freed. The turn summary shows the served count,
+   unhappy departures, revenue and average paid satisfaction (N/A until someone pays).
+6. **Result.** The game always plays all 18 turns. It is a victory if at least 4 customers paid, revenue is at least
+   $45.00 and the average satisfaction of paid customers (taken when they paid) is at least 60. Otherwise it is a
+   defeat.
 
-- `Staff`: `isAvailable`, `startTurn`, `performTask` (one task per turn, and only a successful result uses it up).
-  `StaffTask.execute`.
-- `FrontOfHouseStaff`: `seat` moves a customer from the queue to a table and marks them SEATED, or fails with a
-  reason. `seatingTasks` lists one task per customer who can be seated.
-- `Waiter`: tasks are seat, take order or serve a READY order. `takeOrder` (customer chooses, the pricing policy
-  locks the bill, new PLACED order). `serve`.
-- `Chef`: one task per order that needs preparation. `prepare` does one prep unit.
-- `Cashier`: `processNextPayment` takes payment from the oldest READY_TO_PAY customer (from an earlier turn), records
-  it in the ledger, marks the order and customer PAID and frees the table.
-- `Host` (Stage 3): `listAvailableTasks` returns the seating tasks.
+An invalid choice says why it failed and asks again, without using up the staff member's task. Money is kept in
+whole cents.
 
-### Task 4 - Restaurant floor
+**Food choice.** Customers choose their own food, and the manager never does. Customer n orders menu item n, going
+back to item 1 after the last: customer 1 orders Salad, 2 Burger, 3 Pasta, 4 Salad, and so on. The choice is shown
+when the Waiter takes the order.
 
-- `Table`: `isFree`, `seat`, `release`.
-- `WaitingQueue`: `join`, `remove`, `contains`, `isEmpty`, `size`.
-- `SalesLedger`: `recordPayment` (revenue, paid count, satisfaction at payment). `getAverageSatisfaction` is empty if
-  nobody has paid.
-- `Restaurant`: `getFreeTables`, `findTableOf`, `getSeatedCustomers`, `getActiveOrders`, `removeLeavingCustomer`
-  (cancel the unfinished order, remove from the queue or free the table, count the departure).
-- `ArrivalSchedule`: `isArrivalTurn`, `createCustomer` (the n-th arrival gets id n). For Stage 2, at least one of the
-  six arrivals must be a VIP and one a Critic. Arrival 2 (turn 4) is the VIP and arrival 5 (turn 13) is the Critic.
-  The other four are Regular.
+**Main classes.**
 
-### Task 5 - Game flow & CLI
+| Package | Classes | Responsibility |
+| --- | --- | --- |
+| `entity` | `Customer` (abstract), `RegularCustomer`, `CustomerState` | A customer's life cycle and satisfaction |
+| `entity` | `MenuItem`, `Dish`, `Salad`, `Burger`, `Pasta`, `Menu` | What can be ordered, with price and prep units |
+| `entity` | `Order`, `OrderStatus`, `PricingPolicy`, `StandardPricing` | The bill, locked when the order is taken, and the cooking progress |
+| `entity` | `Staff`, `FrontOfHouseStaff`, `Waiter`, `Chef`, `Cashier`, `StaffTask`, `ActionResult` | One task per staff member per turn, and the tasks each one can do right now |
+| `entity` | `Restaurant`, `Table`, `WaitingQueue`, `SalesLedger` | The floor: tables, queue, staff, revenue and departures |
+| `control` | `GameController`, `ArrivalSchedule`, `GameResult`, `GameView`, `Game` | The turn sequence, arrivals and the result. `Game` wires everything together |
+| `boundary` | `RestaurantCLI` | Shows the state and reads the player's choices. It holds no game rules |
 
-- `GameController.runGame`: play all 18 turns (no early end), then `checkResult`.
-- `runTurn`: reset staff, optional Happy Hour, then `processArrival`, `processManagerChoices` (Host, Waiter, then
-  Chef; ask again on an invalid choice), `processEatingAndPayment`, `processEndTurn` (remove customers who LEFT).
-- `activateHappyHour`, and call `HappyHour.startTurn` / `endTurn` every turn.
-- `checkResult`: victory needs at least 4 paid customers, at least $45 revenue and an average paid satisfaction of
-  at least 60.
-- `GameView`: what the controller needs from a UI, so it doesn't depend on the concrete CLI.
-- `RestaurantCLI` implements `GameView`: `run`, `displayTurnState`, `displayTurnSummary`, `chooseWaiterTask` /
-  `chooseHostTask` / `chooseChefTask` (list the tasks plus Wait, ask again on bad input), `chooseHappyHourActivation`,
-  `displayMessage`, `displayResult`.
+**Test runs.** [`test-runs/`](test-runs/) has one reproducible victory and one reproducible defeat, with notes:
+
+| Run | Paid | Revenue | Average paid satisfaction | Result |
+| --- | :---: | :---: | :---: | --- |
+| `stage-1-victory` | 5 | $66.00 | 79.2 | VICTORY |
+| `stage-1-defeat` (Waiter waits on turns 1-3) | 4 | $51.00 | 58.0 | DEFEAT |
+
+Replay them all with `bash test-runs/replay.sh`.
+
+## Diagrams
+
+`assets/diagrams/` holds the class diagram and the sequence diagram of the final design.
 
 ## Rules
 
