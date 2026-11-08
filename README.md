@@ -22,6 +22,7 @@ The game is built in stages. Each stage is a tagged version that compiles and pl
 | --- | --- | --- |
 | 1. Basic operation | [`stage-1`](https://github.com/DanielNg0729/SC2002-Restaurant-Rush/tree/stage-1) | Regular customers, the menu, Waiter, Chef and Cashier, the full turn sequence, victory and defeat |
 | 2. Customer behaviour | [`stage-2`](https://github.com/DanielNg0729/SC2002-Restaurant-Rush/tree/stage-2) | VIP and Critic customers |
+| 3. New role and menu policy | [`stage-3`](https://github.com/DanielNg0729/SC2002-Restaurant-Rush/tree/stage-3) | Host, Combo meal and Happy Hour |
 
 To play a stage, check out its tag and build it as above, for example `git checkout stage-1`. Run `git checkout main`
 to come back.
@@ -87,7 +88,8 @@ Customer 2 is now a VIP and customer 5 a Critic. The other four are Regular, so 
 | Critic | 12 | Full price | Always orders the most expensive item on the menu (the first one if there is a tie) |
 
 The Critic's rule makes them the hardest customer to finish: they arrive on turn 13, lose satisfaction fastest and
-order Pasta, which needs 2 prep units, so the player has to rush them to get paid by turn 18.
+order Pasta, which needs 2 prep units (from Stage 3, the 3-unit Combo), so the player has to rush them to get paid by
+turn 18.
 
 All three types go through the same order and service flow. The differences live in the customer objects: `Customer`
 asks its subclass for `getWaitingLoss()` at the end of each turn, `StandardPricing` asks for `getPricePercent()` when
@@ -114,11 +116,80 @@ uses the same priorities as Stage 1:
 | `stage-2-victory` | 4 | $49.50 | 81.5 | VICTORY |
 | `stage-2-defeat` (Chef waits on turns 12-14) | 3 | $40.50 | 83.3 | DEFEAT |
 
-Replay the runs of the version you have checked out with `bash test-runs/replay.sh`.
+## Stage 3: New role and menu policy
+
+Each turn now asks about Happy Hour, then the Host, the Waiter and the Chef.
+
+**Host.** A second front-of-house role. Before the Waiter acts, the Host can seat one queued customer at a free
+table, or Wait. The Waiter can still seat customers too, so two customers can be seated in one turn.
+
+**Combo meal.** The menu gains a 4th item, Combo (Salad + Pasta). Its price is 90% of its two dishes, rounded to the
+nearest cent: ($9.00 + $18.00) × 0.9 = $24.30. Its prep units are the sum of the two dishes: 1 + 2 = 3. Customers
+choose a Combo by the same rules as any other item: customer n orders menu item n, so customer 4 orders the Combo, and
+the Critic orders it because it is now the most expensive item. Customer 6 goes back to the start of the menu and
+orders a Burger.
+
+**Happy Hour.** At the start of any turn the player can switch Happy Hour on, once per game. It lasts for that turn
+and the next, and the turn display shows how many turns are left. While it is on:
+
+- Orders taken get 20% off, after the VIP discount. A VIP Burger costs $15.00 × 0.9 × 0.8 = $10.80. The bill is
+  locked when the order is taken, so orders placed earlier keep their price.
+- At the start of each Happy Hour turn, after the arrival, every customer still waiting for a table or for food gets
+  15 satisfaction back (up to 100). Customers who have left are not in the restaurant, so they are not affected.
+
+**New classes.** `Host` reuses the seating it shares with the Waiter through `FrontOfHouseStaff`. `ComboMeal` is a
+`MenuItem` made of two `Dish` objects. `HappyHour` is a `PricingPolicy` that wraps `StandardPricing`, which is why the
+VIP discount applies first.
+
+**Changes from Stage 2** ([compare `stage-2...stage-3`](https://github.com/DanielNg0729/SC2002-Restaurant-Rush/compare/stage-2...stage-3)):
+
+| File | Change | Why |
+| --- | --- | --- |
+| `src/entity/Host.java` | New | A `FrontOfHouseStaff` whose only tasks are the seating tasks it inherits |
+| `src/entity/ComboMeal.java` | New | Works out its name, price and prep units from its two dishes |
+| `src/entity/HappyHour.java` | New | 20% off on top of `StandardPricing` while active, the once-per-game two-turn countdown, and the recovery |
+| `src/control/Game.java` | Changed | Adds Combo (Salad + Pasta) to the menu |
+| `src/entity/Restaurant.java` | Changed | Creates the Host and lists it first in `getAllStaff()`. Adds `setPricing()` so the controller can make Happy Hour the pricing policy for new orders |
+| `src/control/GameController.java` | Changed | Asks about Happy Hour at the start of each turn, applies its recovery after the arrival and counts it down at the end of the turn. Runs the Host step before the Waiter |
+| `src/control/GameView.java` | Changed | Adds `chooseHostTask()` and `chooseHappyHourActivation()`, so the controller can ask for the two new decisions |
+| `src/boundary/RestaurantCLI.java` | Changed | Implements the two new prompts and shows Happy Hour's remaining turns and the Host's task count |
+| `src/entity/Customer.java` | Changed | Adds `recoverIfWaiting()`, so Happy Hour can give satisfaction back without reaching into the customer's state |
+| `test-runs/` | Stage 2 runs replaced by runs A, B and C | The Stage 2 input does not answer the new Happy Hour and Host prompts. The Stage 2 runs stay at tag `stage-2` |
+| `README.md` | Changed | This section |
+
+No class was deleted. The Waiter, Chef, Cashier, `Order` and `StandardPricing` did not change. The Waiter already
+prices each order with whatever `PricingPolicy` the restaurant holds, and the Chef already works through any
+`MenuItem`'s prep units.
+
+**Test runs.** [`test-runs/`](test-runs/) holds runs A, B and C from Part 4.5 of our report, with notes. Each run
+replays through the normal entry point, for example `java -cp out Main < test-runs/run-a-victory.txt`. Run A is the
+scenario in our sequence diagram, and each other run changes one kind of decision:
+
+| Run | Decision changed from run A | Paid | Revenue | Average paid satisfaction | Result |
+| --- | --- | :---: | :---: | :---: | --- |
+| `run-a-victory` | none | 4 | $62.10 | 88.0 | VICTORY |
+| `run-b-defeat` | Chef waits on turns 10-13 | 3 | $37.80 | 92.0 | DEFEAT |
+| `run-c-victory` | On turn 13 the Waiter takes the Critic's order before serving customer 4 | 5 | $86.40 | 81.6 | VICTORY |
+
+`bash test-runs/replay.sh` replays every run of the version you have checked out and compares the output with
+`test-runs/expected/`.
 
 ## Diagrams
 
-`assets/diagrams/` holds the class diagram and the sequence diagram of the final design.
+`assets/diagrams/` holds the [class diagram](assets/diagrams/class-diagram.png) and the
+[sequence diagram](assets/diagrams/sequence-diagram.png) of the final design, which match the Stage 3 code.
+
+## Video
+
+| # | Segment | Timestamp |
+| --- | --- | --- |
+| 1 | The game launching from the submitted project | |
+| 2 | Manager choices, including a decision where staff are constrained | |
+| 3 | A dish going READY, SERVED, then payment | |
+| 4 | A VIP or Critic behaviour | |
+| 5 | A Stage 3 feature | |
+| 6 | One victory and one defeat | |
+| 7 | The stage tag comparisons and the diagrams | |
 
 ## Rules
 
