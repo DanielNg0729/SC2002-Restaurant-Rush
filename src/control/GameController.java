@@ -2,9 +2,11 @@ package control;
 
 import entity.ActionResult;
 import entity.Customer;
+import entity.HappyHour;
 import entity.Restaurant;
 import entity.Staff;
 import entity.StaffTask;
+import entity.StandardPricing;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
@@ -26,6 +28,7 @@ public class GameController {
     private static final int TARGET_AVG_SATISFACTION = 60;
 
     private final Restaurant restaurant;
+    private final HappyHour happyHour;
     private final ArrivalSchedule arrivalSchedule;
     private int currentTurn;
 
@@ -35,13 +38,15 @@ public class GameController {
     private GameView view;
 
     /**
-     * Sets up a new game.
+     * Sets up a new game. Happy Hour starts off unused and sits on top of standard pricing.
      *
      * @param restaurant      the restaurant we're playing in
      * @param arrivalSchedule when customers arrive
      */
     public GameController(Restaurant restaurant, ArrivalSchedule arrivalSchedule) {
         this.restaurant = restaurant;
+        this.happyHour = new HappyHour(new StandardPricing());
+        this.restaurant.setPricing(this.happyHour);
         this.arrivalSchedule = arrivalSchedule;
     }
 
@@ -61,6 +66,15 @@ public class GameController {
      */
     public Restaurant getRestaurant() {
         return restaurant;
+    }
+
+    /**
+     * How many Happy Hour turns are left, for the display.
+     *
+     * @return turns left, or 0 if it's off
+     */
+    public int getHappyHourRemainingTurns() {
+        return happyHour.getRemainingTurns();
     }
 
     /**
@@ -99,14 +113,18 @@ public class GameController {
     }
 
     /**
-     * Plays a single turn: reset the staff, arrivals, show the state, the manager's choices (kitchen and serving),
-     * paying, then the end of the turn.
+     * Plays a single turn: reset the staff, ask about Happy Hour, arrivals, Happy Hour recovery, show the state, the
+     * manager's choices (kitchen and serving), paying, then the end of the turn.
      */
     private void runTurn() {
         for (Staff staff : restaurant.getAllStaff()) {
             staff.startTurn();
         }
+        if (view.chooseHappyHourActivation()) {
+            view.displayMessage(activateHappyHour().getMessage());
+        }
         processArrival();
+        happyHour.startTurn(activeCustomers());
         view.displayTurnState();
         processManagerChoices();
         processEatingAndPayment();
@@ -125,10 +143,11 @@ public class GameController {
     }
 
     /**
-     * Steps 2 and 3. Asks the player what each role should do (or Wait) and runs it, Waiter first, then Chef. If a
-     * choice is invalid we say why and ask again, and the task isn't used up.
+     * Steps 2 and 3. Asks the player what each role should do (or Wait) and runs it, Host first, then Waiter, then
+     * Chef. If a choice is invalid we say why and ask again, and the task isn't used up.
      */
     private void processManagerChoices() {
+        runChosenTask(restaurant.getHost(), view::chooseHostTask);
         runChosenTask(restaurant.getWaiter(), view::chooseWaiterTask);
         runChosenTask(restaurant.getChef(), view::chooseChefTask);
     }
@@ -147,7 +166,7 @@ public class GameController {
 
     /**
      * Step 5. Calls {@code endTurn()} on every customer in the queue or at a table, removes anyone whose satisfaction
-     * hit 0 and shows the end-of-turn summary.
+     * hit 0, counts down Happy Hour and shows the end-of-turn summary.
      */
     private void processEndTurn() {
         for (Customer customer : activeCustomers()) {
@@ -157,7 +176,18 @@ public class GameController {
                 view.displayMessage("Customer " + customer.getId() + " left unhappy.");
             }
         }
+        happyHour.endTurn();
         view.displayTurnSummary();
+    }
+
+    /**
+     * Turns on Happy Hour for the current turn if the player asks for it and it hasn't been used yet.
+     *
+     * @return whether it worked, and why not if it didn't
+     * @since Stage 3
+     */
+    private ActionResult activateHappyHour() {
+        return happyHour.activate();
     }
 
     /**

@@ -2,6 +2,7 @@ package control;
 
 import boundary.RestaurantCLI;
 import entity.Burger;
+import entity.ComboMeal;
 import entity.Menu;
 import entity.Pasta;
 import entity.Restaurant;
@@ -42,6 +43,7 @@ public final class Game {
         return new Menu(List.of(
                 new Salad(),
                 new Burger(),
-                new Pasta()));
+                new Pasta(),
+                new ComboMeal(Salad::new, Pasta::new)));
     }
 }

@@ -46,10 +46,12 @@ public class RestaurantCLI implements GameView {
     @Override
     public void displayTurnState() {
         Restaurant restaurant = controller.getRestaurant();
+        int happyHourTurns = controller.getHappyHourRemainingTurns();
         System.out.println("\n========== TURN " + controller.getCurrentTurn() + " ==========");
         System.out.println("Revenue: " + dollars(restaurant.getLedger().getRevenueCents())
                 + " | Paid: " + restaurant.getLedger().getPaidCount()
                 + " | Average paid satisfaction: " + formatAverage(restaurant.getLedger().getAverageSatisfaction()));
+        System.out.println("Happy Hour: " + (happyHourTurns > 0 ? happyHourTurns + " turn(s) remaining" : "inactive"));
         System.out.println("Waiting queue:");
         List<Customer> queue = restaurant.getWaitingQueue().getCustomers();
         if (queue.isEmpty()) {
@@ -64,8 +66,9 @@ public class RestaurantCLI implements GameView {
             System.out.println("  Table " + table.getNumber() + ": "
                     + table.getOccupant().map(this::describe).orElse("free"));
         }
-        System.out.println("Staff tasks available: Waiter "
-                + restaurant.getWaiter().listAvailableTasks(restaurant).size()
+        System.out.println("Staff tasks available: Host "
+                + restaurant.getHost().listAvailableTasks(restaurant).size()
+                + ", Waiter " + restaurant.getWaiter().listAvailableTasks(restaurant).size()
                 + ", Chef " + restaurant.getChef().listAvailableTasks(restaurant).size());
     }
 
@@ -106,6 +109,19 @@ public class RestaurantCLI implements GameView {
     }
 
     /**
+     * Shows the Host's tasks plus a Wait option and returns what the player picks. Keeps asking until the input is
+     * valid.
+     *
+     * @param tasks what the Host can do this turn
+     * @return the task the player picked, or null for Wait
+     * @since Stage 3
+     */
+    @Override
+    public StaffTask chooseHostTask(List<StaffTask> tasks) {
+        return chooseTask("Host", tasks);
+    }
+
+    /**
      * Shows the Chef's tasks plus a Wait option and returns what the player picks. Keeps asking until the input is
      * valid.
      *
@@ -129,6 +145,24 @@ public class RestaurantCLI implements GameView {
             if (selection == 0) return null;
             if (selection >= 1 && selection <= tasks.size()) return tasks.get(selection - 1);
             displayMessage("Invalid action. Choose a number from 0 to " + tasks.size() + ".");
+        }
+    }
+
+    /**
+     * Asks the player at the start of the turn if they want to turn on Happy Hour.
+     *
+     * @return true if the player wants Happy Hour now
+     * @since Stage 3
+     */
+    @Override
+    public boolean chooseHappyHourActivation() {
+        while (true) {
+            System.out.print("Activate Happy Hour for this and next turn? (y/n): ");
+            if (!scanner.hasNextLine()) throw new IllegalStateException("Input ended before game finished.");
+            String input = scanner.nextLine().trim();
+            if (input.equalsIgnoreCase("y") || input.equalsIgnoreCase("yes")) return true;
+            if (input.equalsIgnoreCase("n") || input.equalsIgnoreCase("no")) return false;
+            displayMessage("Please enter y or n.");
         }
     }
 

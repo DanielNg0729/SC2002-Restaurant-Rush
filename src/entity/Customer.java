@@ -90,6 +90,19 @@ public abstract class Customer {
         }
     }
 
+    
+    final void recoverIfWaiting(int points) {
+        if (points < 0) {
+            throw new IllegalArgumentException(
+                    "Recovery points must not be negative."
+            );
+        }
+
+        if (state.isAwaitingService()) {
+            adjustSatisfaction(points);
+        }
+    }
+
     final void markSeated() {
         moveTo(CustomerState.SEATED);
     }
