@@ -21,6 +21,7 @@ The game is built in stages. Each stage is a tagged version that compiles and pl
 | Stage | Tag | Adds |
 | --- | --- | --- |
 | 1. Basic operation | [`stage-1`](https://github.com/DanielNg0729/SC2002-Restaurant-Rush/tree/stage-1) | Regular customers, the menu, Waiter, Chef and Cashier, the full turn sequence, victory and defeat |
+| 2. Customer behaviour | [`stage-2`](https://github.com/DanielNg0729/SC2002-Restaurant-Rush/tree/stage-2) | VIP and Critic customers |
 
 To play a stage, check out its tag and build it as above, for example `git checkout stage-1`. Run `git checkout main`
 to come back.
@@ -67,14 +68,53 @@ when the Waiter takes the order.
 | `control` | `GameController`, `ArrivalSchedule`, `GameResult`, `GameView`, `Game` | The turn sequence, arrivals and the result. `Game` wires everything together |
 | `boundary` | `RestaurantCLI` | Shows the state and reads the player's choices. It holds no game rules |
 
-**Test runs.** [`test-runs/`](test-runs/) has one reproducible victory and one reproducible defeat, with notes:
+**Test runs.** [`test-runs/` at tag `stage-1`](https://github.com/DanielNg0729/SC2002-Restaurant-Rush/tree/stage-1/test-runs)
+has one reproducible victory and one reproducible defeat, with notes:
 
 | Run | Paid | Revenue | Average paid satisfaction | Result |
 | --- | :---: | :---: | :---: | --- |
 | `stage-1-victory` | 5 | $66.00 | 79.2 | VICTORY |
 | `stage-1-defeat` (Waiter waits on turns 1-3) | 4 | $51.00 | 58.0 | DEFEAT |
 
-Replay them all with `bash test-runs/replay.sh`.
+## Stage 2: Customer behaviour
+
+Customer 2 is now a VIP and customer 5 a Critic. The other four are Regular, so there are still six arrivals.
+
+| Customer | Satisfaction lost per waiting turn | Bill | Food choice |
+| --- | :---: | --- | --- |
+| Regular | 8 | Full price | Customer n orders menu item n, going back to item 1 after the last |
+| VIP | 5 | 10% off (Burger $13.50) | Same as Regular |
+| Critic | 12 | Full price | Always orders the most expensive item on the menu (the first one if there is a tie) |
+
+The Critic's rule makes them the hardest customer to finish: they arrive on turn 13, lose satisfaction fastest and
+order Pasta, which needs 2 prep units, so the player has to rush them to get paid by turn 18.
+
+All three types go through the same order and service flow. The differences live in the customer objects: `Customer`
+asks its subclass for `getWaitingLoss()` at the end of each turn, `StandardPricing` asks for `getPricePercent()` when
+the order is taken, and the Waiter asks the customer to `chooseItem(menu)`. The controller has no type checks.
+
+**Changes from Stage 1** ([compare `stage-1...stage-2`](https://github.com/DanielNg0729/SC2002-Restaurant-Rush/compare/stage-1...stage-2)):
+
+| File | Change | Why |
+| --- | --- | --- |
+| `src/entity/VIPCustomer.java` | New | Overrides `getWaitingLoss()` (5) and `getPricePercent()` (90) |
+| `src/entity/CriticCustomer.java` | New | Overrides `getWaitingLoss()` (12) and `chooseItem()` (most expensive item) |
+| `src/control/ArrivalSchedule.java` | Changed | Creates a VIP for the 2nd arrival and a Critic for the 5th, so every base-setting game has one of each |
+| `test-runs/` | Stage 1 runs replaced by Stage 2 runs | The Stage 1 input plays a different game with a VIP and a Critic. The Stage 1 runs stay at tag `stage-1` |
+| `README.md` | Changed | This section |
+
+No other class changed. The controller, staff and pricing already worked with any `Customer`, so the new types plug in
+without touching them.
+
+**Test runs.** [`test-runs/` at tag `stage-2`](https://github.com/DanielNg0729/SC2002-Restaurant-Rush/tree/stage-2/test-runs)
+uses the same priorities as Stage 1:
+
+| Run | Paid | Revenue | Average paid satisfaction | Result |
+| --- | :---: | :---: | :---: | --- |
+| `stage-2-victory` | 4 | $49.50 | 81.5 | VICTORY |
+| `stage-2-defeat` (Chef waits on turns 12-14) | 3 | $40.50 | 83.3 | DEFEAT |
+
+Replay the runs of the version you have checked out with `bash test-runs/replay.sh`.
 
 ## Diagrams
 
