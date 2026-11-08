@@ -1,0 +1,466 @@
+=== Restaurant Rush ===
+Activate Happy Hour for this and next turn? (y/n): Customer 1 arrived.
+
+========== TURN 1 ==========
+Revenue: $0.00 | Paid: 0 | Average paid satisfaction: N/A
+Happy Hour: inactive
+Waiting queue:
+  Customer 1 (Regular, satisfaction 100, WAITING, no order)
+Tables:
+  Table 1: free
+  Table 2: free
+Staff tasks available: Host 1, Waiter 1, Chef 0
+
+Host actions:
+  0. Wait
+  1. Seat customer 1
+Choose Host action: Seated customer 1 at table 1.
+
+Waiter actions:
+  0. Wait
+  1. Take order from customer 1
+Choose Waiter action: Customer 1 ordered Salad for 900 cents.
+
+Chef actions:
+  0. Wait
+  1. Prepare Salad for customer 1
+Choose Chef action: Prepared one unit for customer 1; 0 unit(s) remaining.
+End of turn 1: served 0, unhappy departures 0, revenue $0.00, average paid satisfaction N/A.
+Activate Happy Hour for this and next turn? (y/n): 
+========== TURN 2 ==========
+Revenue: $0.00 | Paid: 0 | Average paid satisfaction: N/A
+Happy Hour: inactive
+Waiting queue:
+  (empty)
+Tables:
+  Table 1: Customer 1 (Regular, satisfaction 92, ORDERED, Salad [READY])
+  Table 2: free
+Staff tasks available: Host 0, Waiter 1, Chef 0
+
+Host actions:
+  0. Wait
+Choose Host action: Host waits.
+
+Waiter actions:
+  0. Wait
+  1. Serve customer 1
+Choose Waiter action: Served customer 1.
+
+Chef actions:
+  0. Wait
+Choose Chef action: Chef waits.
+End of turn 2: served 1, unhappy departures 0, revenue $0.00, average paid satisfaction N/A.
+Activate Happy Hour for this and next turn? (y/n): 
+========== TURN 3 ==========
+Revenue: $0.00 | Paid: 0 | Average paid satisfaction: N/A
+Happy Hour: inactive
+Waiting queue:
+  (empty)
+Tables:
+  Table 1: Customer 1 (Regular, satisfaction 92, EATING, Salad [SERVED])
+  Table 2: free
+Staff tasks available: Host 0, Waiter 0, Chef 0
+
+Host actions:
+  0. Wait
+Choose Host action: Host waits.
+
+Waiter actions:
+  0. Wait
+Choose Waiter action: Waiter waits.
+
+Chef actions:
+  0. Wait
+Choose Chef action: Chef waits.
+End of turn 3: served 1, unhappy departures 0, revenue $0.00, average paid satisfaction N/A.
+Activate Happy Hour for this and next turn? (y/n): Happy Hour is on for 2 turns!
+Customer 2 arrived.
+
+========== TURN 4 ==========
+Revenue: $0.00 | Paid: 0 | Average paid satisfaction: N/A
+Happy Hour: 2 turn(s) remaining
+Waiting queue:
+  Customer 2 (VIP, satisfaction 100, WAITING, no order)
+Tables:
+  Table 1: Customer 1 (Regular, satisfaction 92, READY_TO_PAY, Salad [SERVED])
+  Table 2: free
+Staff tasks available: Host 1, Waiter 1, Chef 0
+
+Host actions:
+  0. Wait
+  1. Seat customer 2
+Choose Host action: Seated customer 2 at table 2.
+
+Waiter actions:
+  0. Wait
+  1. Take order from customer 2
+Choose Waiter action: Customer 2 ordered Burger for 1080 cents.
+
+Chef actions:
+  0. Wait
+  1. Prepare Burger for customer 2
+Choose Chef action: Prepared one unit for customer 2; 0 unit(s) remaining.
+Customer 1 paid 900 cents.
+End of turn 4: served 1, unhappy departures 0, revenue $9.00, average paid satisfaction 92.0.
+Activate Happy Hour for this and next turn? (y/n): 
+========== TURN 5 ==========
+Revenue: $9.00 | Paid: 1 | Average paid satisfaction: 92.0
+Happy Hour: 1 turn(s) remaining
+Waiting queue:
+  (empty)
+Tables:
+  Table 1: free
+  Table 2: Customer 2 (VIP, satisfaction 100, ORDERED, Burger [READY])
+Staff tasks available: Host 0, Waiter 1, Chef 0
+
+Host actions:
+  0. Wait
+Choose Host action: Host waits.
+
+Waiter actions:
+  0. Wait
+  1. Serve customer 2
+Choose Waiter action: Served customer 2.
+
+Chef actions:
+  0. Wait
+Choose Chef action: Chef waits.
+End of turn 5: served 2, unhappy departures 0, revenue $9.00, average paid satisfaction 92.0.
+Activate Happy Hour for this and next turn? (y/n): 
+========== TURN 6 ==========
+Revenue: $9.00 | Paid: 1 | Average paid satisfaction: 92.0
+Happy Hour: inactive
+Waiting queue:
+  (empty)
+Tables:
+  Table 1: free
+  Table 2: Customer 2 (VIP, satisfaction 100, EATING, Burger [SERVED])
+Staff tasks available: Host 0, Waiter 0, Chef 0
+
+Host actions:
+  0. Wait
+Choose Host action: Host waits.
+
+Waiter actions:
+  0. Wait
+Choose Waiter action: Waiter waits.
+
+Chef actions:
+  0. Wait
+Choose Chef action: Chef waits.
+End of turn 6: served 2, unhappy departures 0, revenue $9.00, average paid satisfaction 92.0.
+Activate Happy Hour for this and next turn? (y/n): Customer 3 arrived.
+
+========== TURN 7 ==========
+Revenue: $9.00 | Paid: 1 | Average paid satisfaction: 92.0
+Happy Hour: inactive
+Waiting queue:
+  Customer 3 (Regular, satisfaction 100, WAITING, no order)
+Tables:
+  Table 1: free
+  Table 2: Customer 2 (VIP, satisfaction 100, READY_TO_PAY, Burger [SERVED])
+Staff tasks available: Host 1, Waiter 1, Chef 0
+
+Host actions:
+  0. Wait
+  1. Seat customer 3
+Choose Host action: Seated customer 3 at table 1.
+
+Waiter actions:
+  0. Wait
+  1. Take order from customer 3
+Choose Waiter action: Customer 3 ordered Pasta for 1800 cents.
+
+Chef actions:
+  0. Wait
+  1. Prepare Pasta for customer 3
+Choose Chef action: Prepared one unit for customer 3; 1 unit(s) remaining.
+Customer 2 paid 1080 cents.
+End of turn 7: served 2, unhappy departures 0, revenue $19.80, average paid satisfaction 96.0.
+Activate Happy Hour for this and next turn? (y/n): 
+========== TURN 8 ==========
+Revenue: $19.80 | Paid: 2 | Average paid satisfaction: 96.0
+Happy Hour: inactive
+Waiting queue:
+  (empty)
+Tables:
+  Table 1: Customer 3 (Regular, satisfaction 92, ORDERED, Pasta [IN_PREPARATION])
+  Table 2: free
+Staff tasks available: Host 0, Waiter 0, Chef 1
+
+Host actions:
+  0. Wait
+Choose Host action: Host waits.
+
+Waiter actions:
+  0. Wait
+Choose Waiter action: Waiter waits.
+
+Chef actions:
+  0. Wait
+  1. Prepare Pasta for customer 3
+Choose Chef action: Prepared one unit for customer 3; 0 unit(s) remaining.
+End of turn 8: served 2, unhappy departures 0, revenue $19.80, average paid satisfaction 96.0.
+Activate Happy Hour for this and next turn? (y/n): 
+========== TURN 9 ==========
+Revenue: $19.80 | Paid: 2 | Average paid satisfaction: 96.0
+Happy Hour: inactive
+Waiting queue:
+  (empty)
+Tables:
+  Table 1: Customer 3 (Regular, satisfaction 84, ORDERED, Pasta [READY])
+  Table 2: free
+Staff tasks available: Host 0, Waiter 1, Chef 0
+
+Host actions:
+  0. Wait
+Choose Host action: Host waits.
+
+Waiter actions:
+  0. Wait
+  1. Serve customer 3
+Choose Waiter action: Served customer 3.
+
+Chef actions:
+  0. Wait
+Choose Chef action: Chef waits.
+End of turn 9: served 3, unhappy departures 0, revenue $19.80, average paid satisfaction 96.0.
+Activate Happy Hour for this and next turn? (y/n): Customer 4 arrived.
+
+========== TURN 10 ==========
+Revenue: $19.80 | Paid: 2 | Average paid satisfaction: 96.0
+Happy Hour: inactive
+Waiting queue:
+  Customer 4 (Regular, satisfaction 100, WAITING, no order)
+Tables:
+  Table 1: Customer 3 (Regular, satisfaction 84, EATING, Pasta [SERVED])
+  Table 2: free
+Staff tasks available: Host 1, Waiter 1, Chef 0
+
+Host actions:
+  0. Wait
+  1. Seat customer 4
+Choose Host action: Seated customer 4 at table 2.
+
+Waiter actions:
+  0. Wait
+  1. Take order from customer 4
+Choose Waiter action: Customer 4 ordered Combo (Salad + Pasta) for 2430 cents.
+
+Chef actions:
+  0. Wait
+  1. Prepare Combo (Salad + Pasta) for customer 4
+Choose Chef action: Prepared one unit for customer 4; 2 unit(s) remaining.
+End of turn 10: served 3, unhappy departures 0, revenue $19.80, average paid satisfaction 96.0.
+Activate Happy Hour for this and next turn? (y/n): 
+========== TURN 11 ==========
+Revenue: $19.80 | Paid: 2 | Average paid satisfaction: 96.0
+Happy Hour: inactive
+Waiting queue:
+  (empty)
+Tables:
+  Table 1: Customer 3 (Regular, satisfaction 84, READY_TO_PAY, Pasta [SERVED])
+  Table 2: Customer 4 (Regular, satisfaction 92, ORDERED, Combo (Salad + Pasta) [IN_PREPARATION])
+Staff tasks available: Host 0, Waiter 0, Chef 1
+
+Host actions:
+  0. Wait
+Choose Host action: Host waits.
+
+Waiter actions:
+  0. Wait
+Choose Waiter action: Waiter waits.
+
+Chef actions:
+  0. Wait
+  1. Prepare Combo (Salad + Pasta) for customer 4
+Choose Chef action: Prepared one unit for customer 4; 1 unit(s) remaining.
+Customer 3 paid 1800 cents.
+End of turn 11: served 3, unhappy departures 0, revenue $37.80, average paid satisfaction 92.0.
+Activate Happy Hour for this and next turn? (y/n): 
+========== TURN 12 ==========
+Revenue: $37.80 | Paid: 3 | Average paid satisfaction: 92.0
+Happy Hour: inactive
+Waiting queue:
+  (empty)
+Tables:
+  Table 1: free
+  Table 2: Customer 4 (Regular, satisfaction 84, ORDERED, Combo (Salad + Pasta) [IN_PREPARATION])
+Staff tasks available: Host 0, Waiter 0, Chef 1
+
+Host actions:
+  0. Wait
+Choose Host action: Host waits.
+
+Waiter actions:
+  0. Wait
+Choose Waiter action: Waiter waits.
+
+Chef actions:
+  0. Wait
+  1. Prepare Combo (Salad + Pasta) for customer 4
+Choose Chef action: Prepared one unit for customer 4; 0 unit(s) remaining.
+End of turn 12: served 3, unhappy departures 0, revenue $37.80, average paid satisfaction 92.0.
+Activate Happy Hour for this and next turn? (y/n): Customer 5 arrived.
+
+========== TURN 13 ==========
+Revenue: $37.80 | Paid: 3 | Average paid satisfaction: 92.0
+Happy Hour: inactive
+Waiting queue:
+  Customer 5 (Critic, satisfaction 100, WAITING, no order)
+Tables:
+  Table 1: free
+  Table 2: Customer 4 (Regular, satisfaction 76, ORDERED, Combo (Salad + Pasta) [READY])
+Staff tasks available: Host 1, Waiter 2, Chef 0
+
+Host actions:
+  0. Wait
+  1. Seat customer 5
+Choose Host action: Seated customer 5 at table 1.
+
+Waiter actions:
+  0. Wait
+  1. Take order from customer 5
+  2. Serve customer 4
+Choose Waiter action: Customer 5 ordered Combo (Salad + Pasta) for 2430 cents.
+
+Chef actions:
+  0. Wait
+  1. Prepare Combo (Salad + Pasta) for customer 5
+Choose Chef action: Prepared one unit for customer 5; 2 unit(s) remaining.
+End of turn 13: served 3, unhappy departures 0, revenue $37.80, average paid satisfaction 92.0.
+Activate Happy Hour for this and next turn? (y/n): 
+========== TURN 14 ==========
+Revenue: $37.80 | Paid: 3 | Average paid satisfaction: 92.0
+Happy Hour: inactive
+Waiting queue:
+  (empty)
+Tables:
+  Table 1: Customer 5 (Critic, satisfaction 88, ORDERED, Combo (Salad + Pasta) [IN_PREPARATION])
+  Table 2: Customer 4 (Regular, satisfaction 68, ORDERED, Combo (Salad + Pasta) [READY])
+Staff tasks available: Host 0, Waiter 1, Chef 1
+
+Host actions:
+  0. Wait
+Choose Host action: Host waits.
+
+Waiter actions:
+  0. Wait
+  1. Serve customer 4
+Choose Waiter action: Served customer 4.
+
+Chef actions:
+  0. Wait
+  1. Prepare Combo (Salad + Pasta) for customer 5
+Choose Chef action: Prepared one unit for customer 5; 1 unit(s) remaining.
+End of turn 14: served 4, unhappy departures 0, revenue $37.80, average paid satisfaction 92.0.
+Activate Happy Hour for this and next turn? (y/n): 
+========== TURN 15 ==========
+Revenue: $37.80 | Paid: 3 | Average paid satisfaction: 92.0
+Happy Hour: inactive
+Waiting queue:
+  (empty)
+Tables:
+  Table 1: Customer 5 (Critic, satisfaction 76, ORDERED, Combo (Salad + Pasta) [IN_PREPARATION])
+  Table 2: Customer 4 (Regular, satisfaction 68, EATING, Combo (Salad + Pasta) [SERVED])
+Staff tasks available: Host 0, Waiter 0, Chef 1
+
+Host actions:
+  0. Wait
+Choose Host action: Host waits.
+
+Waiter actions:
+  0. Wait
+Choose Waiter action: Waiter waits.
+
+Chef actions:
+  0. Wait
+  1. Prepare Combo (Salad + Pasta) for customer 5
+Choose Chef action: Prepared one unit for customer 5; 0 unit(s) remaining.
+End of turn 15: served 4, unhappy departures 0, revenue $37.80, average paid satisfaction 92.0.
+Activate Happy Hour for this and next turn? (y/n): Customer 6 arrived.
+
+========== TURN 16 ==========
+Revenue: $37.80 | Paid: 3 | Average paid satisfaction: 92.0
+Happy Hour: inactive
+Waiting queue:
+  Customer 6 (Regular, satisfaction 100, WAITING, no order)
+Tables:
+  Table 1: Customer 5 (Critic, satisfaction 64, ORDERED, Combo (Salad + Pasta) [READY])
+  Table 2: Customer 4 (Regular, satisfaction 68, READY_TO_PAY, Combo (Salad + Pasta) [SERVED])
+Staff tasks available: Host 0, Waiter 1, Chef 0
+
+Host actions:
+  0. Wait
+Choose Host action: Host waits.
+
+Waiter actions:
+  0. Wait
+  1. Serve customer 5
+Choose Waiter action: Served customer 5.
+
+Chef actions:
+  0. Wait
+Choose Chef action: Chef waits.
+Customer 4 paid 2430 cents.
+End of turn 16: served 5, unhappy departures 0, revenue $62.10, average paid satisfaction 86.0.
+Activate Happy Hour for this and next turn? (y/n): 
+========== TURN 17 ==========
+Revenue: $62.10 | Paid: 4 | Average paid satisfaction: 86.0
+Happy Hour: inactive
+Waiting queue:
+  Customer 6 (Regular, satisfaction 92, WAITING, no order)
+Tables:
+  Table 1: Customer 5 (Critic, satisfaction 64, EATING, Combo (Salad + Pasta) [SERVED])
+  Table 2: free
+Staff tasks available: Host 1, Waiter 1, Chef 0
+
+Host actions:
+  0. Wait
+  1. Seat customer 6
+Choose Host action: Seated customer 6 at table 2.
+
+Waiter actions:
+  0. Wait
+  1. Take order from customer 6
+Choose Waiter action: Customer 6 ordered Burger for 1500 cents.
+
+Chef actions:
+  0. Wait
+  1. Prepare Burger for customer 6
+Choose Chef action: Prepared one unit for customer 6; 0 unit(s) remaining.
+End of turn 17: served 5, unhappy departures 0, revenue $62.10, average paid satisfaction 86.0.
+Activate Happy Hour for this and next turn? (y/n): 
+========== TURN 18 ==========
+Revenue: $62.10 | Paid: 4 | Average paid satisfaction: 86.0
+Happy Hour: inactive
+Waiting queue:
+  (empty)
+Tables:
+  Table 1: Customer 5 (Critic, satisfaction 64, READY_TO_PAY, Combo (Salad + Pasta) [SERVED])
+  Table 2: Customer 6 (Regular, satisfaction 84, ORDERED, Burger [READY])
+Staff tasks available: Host 0, Waiter 1, Chef 0
+
+Host actions:
+  0. Wait
+Choose Host action: Host waits.
+
+Waiter actions:
+  0. Wait
+  1. Serve customer 6
+Choose Waiter action: Served customer 6.
+
+Chef actions:
+  0. Wait
+Choose Chef action: Chef waits.
+Customer 5 paid 2430 cents.
+End of turn 18: served 6, unhappy departures 0, revenue $86.40, average paid satisfaction 81.6.
+
+========== FINAL RESULT ==========
+VICTORY
+Served: 6
+Paid: 5
+Unhappy departures: 0
+Revenue: $86.40
+Average paid satisfaction: 81.6
+Turns used: 18
