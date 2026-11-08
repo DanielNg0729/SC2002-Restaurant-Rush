@@ -66,8 +66,9 @@ public class Cashier extends Staff {
             order.markPaid();
             customer.markPaid();
             table.release();
-            return ActionResult.ok("Customer " + customer.getId() + " paid "
-                    + order.getBillCents() + " cents.");
+            int billCents = order.getBillCents();
+            return ActionResult.ok(String.format("Customer %d paid $%d.%02d.",
+                    customer.getId(), billCents / 100, billCents % 100));
         });
     }
 
