@@ -14,14 +14,13 @@ public class Restaurant {
     private static final int TABLE_COUNT = 2;
 
     private final Menu menu;
-    private PricingPolicy pricing;
+    private final PricingPolicy pricing;
     private final List<Table> tables;
     private final WaitingQueue waitingQueue;
     private final SalesLedger ledger;
     private final Waiter waiter;
     private final Chef chef;
     private final Cashier cashier;
-    private final Host host;
     private int departureCount = 0;
 
     /**
@@ -42,7 +41,6 @@ public class Restaurant {
         this.waiter = new Waiter("Waiter");
         this.chef = new Chef("Chef");
         this.cashier = new Cashier("Cashier");
-        this.host = new Host("Host");
     }
 
     public Menu getMenu() {
@@ -56,18 +54,6 @@ public class Restaurant {
      */
     public PricingPolicy getPricing() {
         return pricing;
-    }
-
-    /**
-     * Changes the policy used for future orders. Existing orders keep their quoted price.
-     *
-     * @param pricing the new pricing policy
-     */
-    public void setPricing(PricingPolicy pricing) {
-        if (pricing == null) {
-            throw new IllegalArgumentException("A pricing policy is required.");
-        }
-        this.pricing = pricing;
     }
 
     /**
@@ -149,22 +135,12 @@ public class Restaurant {
     }
 
     /**
-     * The Host, who seats customers alongside the Waiter.
-     *
-     * @return the Host
-     * @since Stage 3
-     */
-    public Host getHost() {
-        return host;
-    }
-
-    /**
-     * Every staff member, in the order they act each turn (Host, Waiter, Chef, Cashier).
+     * Every staff member, in the order they act each turn (Waiter, Chef, Cashier).
      *
      * @return the staff (read-only list)
      */
     public List<Staff> getAllStaff() {
-        return List.of(host, waiter, chef, cashier);
+        return List.of(waiter, chef, cashier);
     }
 
     /**
