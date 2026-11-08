@@ -11,52 +11,57 @@ From the project root, in Git Bash:
 ```bash
 bash test-runs/replay.sh                                            # replay every run here and compare with expected/
 javac -d out src/*.java src/boundary/*.java src/control/*.java src/entity/*.java
-java -cp out Main < test-runs/stage-1-victory.txt                   # watch one run
+java -cp out Main < test-runs/stage-2-victory.txt                   # watch one run
 ```
 
-In PowerShell, pipe the file instead: `Get-Content test-runs\stage-1-victory.txt | java -cp out Main`.
+In PowerShell, pipe the file instead: `Get-Content test-runs\stage-2-victory.txt | java -cp out Main`.
 
 Each line answers one prompt. `0` means Wait and `n` picks the n-th task in the list printed above the prompt.
-Stage 1 asks the Waiter, then the Chef, on every turn, so each file has 18 × 2 = 36 lines.
+Stage 2 asks the Waiter, then the Chef, on every turn, so each file has 18 × 2 = 36 lines.
 
-## Stage 1 runs
+This folder only holds the runs for the code at this version. The runs for earlier stages are kept at their tags,
+because their input plays a different game once the customers change:
+[Stage 1 runs](https://github.com/DanielNg0729/SC2002-Restaurant-Rush/tree/stage-1/test-runs).
 
-Both runs use the same priorities. The Waiter serves a READY order first, otherwise takes an order, otherwise seats
-the first customer in the queue. The Chef prepares an order whenever one needs work (the first one listed). The
-defeat changes one decision.
+## Stage 2 runs
+
+Customer 2 is a VIP and customer 5 is a Critic. Both runs use the same priorities as the Stage 1 runs. The Waiter
+serves a READY order first, otherwise takes an order, otherwise seats the first customer in the queue. The Chef
+prepares an order whenever one needs work (the first one listed). The defeat changes one decision.
 
 | Run | Decision changed | Paid | Revenue | Average paid satisfaction | Result |
 | --- | --- | :---: | :---: | :---: | --- |
-| `stage-1-victory` | none | 5 | $66.00 | 79.2 | VICTORY |
-| `stage-1-defeat` | Waiter waits on turns 1-3 | 4 | $51.00 | 58.0 | DEFEAT |
+| `stage-2-victory` | none | 4 | $49.50 | 81.5 | VICTORY |
+| `stage-2-defeat` | Chef waits on turns 12-14 | 3 | $40.50 | 83.3 | DEFEAT |
 
-### `stage-1-victory`
+### `stage-2-victory`
 
-| Customer | Dish | Bill | Paid on turn | Satisfaction when paying |
-| --- | --- | :---: | :---: | :---: |
-| 1 | Salad | $9.00 | 5 | 84 |
-| 2 | Burger | $15.00 | 8 | 84 |
-| 3 | Pasta | $18.00 | 12 | 76 |
-| 4 | Salad | $9.00 | 15 | 76 |
-| 5 | Burger | $15.00 | 18 | 76 |
-| 6 | Pasta | - | not paid | - |
+| Customer | Type | Dish | Bill | Paid on turn | Satisfaction when paying |
+| --- | --- | --- | :---: | :---: | :---: |
+| 1 | Regular | Salad | $9.00 | 5 | 84 |
+| 2 | VIP | Burger | $13.50 | 8 | 90 |
+| 3 | Regular | Pasta | $18.00 | 12 | 76 |
+| 4 | Regular | Salad | $9.00 | 15 | 76 |
+| 5 | Critic | Pasta | - | not paid (served on turn 17) | - |
+| 6 | Regular | Pasta | - | not paid | - |
 
-Every customer needs three Waiter tasks (seat, take order, serve), and a new customer arrives every three turns, so
-the Waiter has almost no spare turns. On turns 10, 13 and 16 the Waiter can either serve a READY order or seat the customer who
-has just arrived. Serving first gets the payment in sooner, and the new arrival waits one turn in the queue (8
-points). Customer 6 arrives on turn 16 and cannot pay within 18 turns, as the brief expects.
+The VIP pays 10% less ($13.50 for the Burger) and loses 5 points per waiting turn instead of 8, so they pay with 90.
+The Critic arrives on turn 13, orders the most expensive item (Pasta, 2 prep units) and loses 12 points per waiting
+turn. They are served on turn 17 and are only ready to pay at the end of turn 18, so 4 customers pay. That is still
+enough to win: $49.50 and an average of 81.5.
 
-### `stage-1-defeat`
+### `stage-2-defeat`
 
-| Customer | Dish | Bill | Paid on turn | Satisfaction when paying |
-| --- | --- | :---: | :---: | :---: |
-| 1 | Salad | $9.00 | 8 | 60 |
-| 2 | Burger | $15.00 | 11 | 60 |
-| 3 | Pasta | $18.00 | 15 | 52 |
-| 4 | Salad | $9.00 | 17 | 60 |
-| 5 | Burger | - | not paid (served on turn 18) | - |
-| 6 | - | - | not paid (still in the queue) | - |
+| Customer | Type | Dish | Bill | Paid on turn | Satisfaction when paying |
+| --- | --- | --- | :---: | :---: | :---: |
+| 1 | Regular | Salad | $9.00 | 5 | 84 |
+| 2 | VIP | Burger | $13.50 | 8 | 90 |
+| 3 | Regular | Pasta | $18.00 | 12 | 76 |
+| 4 | Regular | Salad | - | not paid (served on turn 18) | - |
+| 5 | Critic | Pasta | - | not paid (served on turn 17) | - |
+| 6 | Regular | - | - | not paid (still in the queue) | - |
 
-The Waiter waits on turns 1-3, so customer 1 sits in the queue until turn 4. Because the Waiter has almost no spare
-turns, the three lost turns are never won back and every later customer waits longer. Four customers still pay
-$51.00, but their average satisfaction is 58.0, below the target of 60, so the game is lost on satisfaction alone.
+The Chef waits on turns 12-14, so customer 4's Salad, ordered on turn 12, is not started. When the Chef starts again
+on turn 15, the first order listed is the Critic's Pasta at table 1, which takes turns 15 and 16. Customer 4's Salad
+is only cooked on turn 17. The Critic and customer 4 are served on turns 17 and 18, too late to pay. Only 3 customers
+pay, for $40.50, so the game fails the paid and revenue targets even though the average (83.3) is high.
