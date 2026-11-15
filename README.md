@@ -184,10 +184,10 @@ scenario in our sequence diagram, and each other run changes one kind of decisio
 | # | Segment | Timestamp |
 | --- | --- | --- |
 | 1 | The game launching from the submitted project | |
-| 2 | Manager choices, including a decision where staff are constrained | |
+| 2 | Manager choices, including a decision where staff are constrained |9:36|
 | 3 | A dish going READY, SERVED, then payment | |
 | 4 | A VIP or Critic behaviour | |
 | 5 | A Stage 3 feature | |
-| 6 | One victory and one defeat | |
+| 6 | One victory and one defeat |11:26|
 | 7 | The stage tag comparisons and the diagrams | |
 
