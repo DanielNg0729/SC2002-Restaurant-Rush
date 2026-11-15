@@ -191,10 +191,3 @@ scenario in our sequence diagram, and each other run changes one kind of decisio
 | 6 | One victory and one defeat | |
 | 7 | The stage tag comparisons and the diagrams | |
 
-## Rules
-
-- Branch off `main`, edit only your task's files, and open a PR into `main`.
-- Don't rename classes, methods or fields or change signatures. They have to match the class diagram. If you need
-  a change in someone else's file, ask the owner.
-- The Javadoc is the spec. Update it if the behaviour changes.
-- Commit with `git commit -s`.
